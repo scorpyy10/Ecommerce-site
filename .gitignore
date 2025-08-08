@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.eggs/
+*.log
+
+# Environments
+.env
+.env.*
+.venv/
+venv/
+ENV/
+
+# Django
+/staticfiles/
+/static/
+/media/*
+!media/.gitkeep
+
+# Database (dev)
+db.sqlite3
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node (if present)
+node_modules/
+yarn.lock
+
+# Migrations cache (keep migrations tracked, just ignore pyc)
+**/migrations/__pycache__/

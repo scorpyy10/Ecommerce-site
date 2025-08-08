@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} Projects - Devam Project{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Category Header -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ category.name }}</h1>
+        {% if category.description %}
+        <p class="text-gray-600">{{ category.description }}</p>
+        {% endif %}
+    </div>
+    
+    {% if projects %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {% for project in projects %}
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift hover:shadow-xl transition-all duration-300">
+            {% with project.get_featured_image_url as image_url %}
+            <!-- Image Section -->
+            <div class="relative overflow-hidden h-48">
+                {% if image_url %}
+                    <img src="{{ image_url }}" alt="{{ project.title }}" 
+                         class="w-full h-48 object-cover transition-transform duration-300 hover:scale-110"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                {% endif %}
+                <!-- Fallback display -->
+                <div class="w-full h-48 bg-gradient-to-br from-blue-100 via-purple-50 to-indigo-100 flex items-center justify-center" {% if image_url %}style="display:none;"{% endif %}>
+                    <div class="text-center">
+                        {% if project.category.name == 'AI & ML' %}
+                            <i class="fas fa-brain text-blue-500 text-4xl mb-2"></i>
+                        {% elif project.category.name == 'Drones' %}
+                            <i class="fas fa-helicopter text-blue-500 text-4xl mb-2"></i>
+                        {% elif project.category.name == 'IOT Circuits' %}
+                            <i class="fas fa-microchip text-blue-500 text-4xl mb-2"></i>
+                        {% else %}
+                            <i class="fas fa-cogs text-blue-500 text-4xl mb-2"></i>
+                        {% endif %}
+                        <p class="text-blue-600 font-medium text-sm">{{ project.category.name }}</p>
+                        <p class="text-blue-400 text-xs mt-1">{% if image_url %}Loading Image...{% else %}No Image Available{% endif %}</p>
+                    </div>
+                </div>
+            </div>
+            {% endwith %}
+            
+            <div class="p-6">
+                <div class="mb-4">
+                    <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-2">
+                        {{ project.category.name }}
+                    </span>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2 hover:text-blue-600 transition-colors duration-200">
+                        {{ project.title }}
+                    </h3>
+                    <p class="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
+                        {{ project.description|truncatewords:15 }}
+                    </p>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="flex items-baseline">
+                        <span class="text-2xl font-bold text-gradient">₹{{ project.price }}</span>
+                        <span class="text-sm text-gray-500 ml-1">onwards</span>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col space-y-3">
+                    <a href="{% url 'project_detail' project.slug %}" 
+                       class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg text-sm font-medium text-center transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 flex items-center justify-center">
+                        <i class="fas fa-eye mr-2"></i>View Details
+                    </a>
+                    <form method="POST" action="{% url 'add_to_cart' project.id %}" class="w-full">
+                        {% csrf_token %}
+                        <button type="submit" 
+                                class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 flex items-center justify-center">
+                            <i class="fas fa-cart-plus mr-2"></i>Add to Cart
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="mt-8 flex justify-center">
+        <nav class="flex space-x-2">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" 
+               class="px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
+                Previous
+            </a>
+            {% endif %}
+            
+            <span class="px-3 py-2 text-sm text-gray-700">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" 
+               class="px-3 py-2 border border-gray-300 rounded-md text-sm hover:bg-gray-50">
+                Next
+            </a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <div class="text-center py-12">
+        <div class="text-gray-400 mb-4">
+            <i class="fas fa-search text-6xl"></i>
+        </div>
+        <h3 class="text-xl font-medium text-gray-800 mb-2">No projects found</h3>
+        <p class="text-gray-600 mb-6">There are no projects in this category yet.</p>
+        <a href="{% url 'project_list' %}" 
+           class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-200">
+            Browse All Projects
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Failed - Devam Project{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center">
+        <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-red-100 mb-6">
+            <svg class="h-12 w-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </div>
+        
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">Payment Failed</h1>
+        <p class="text-lg text-gray-600 mb-8">
+            Unfortunately, your payment could not be processed. Please try again.
+        </p>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">What can you do?</h2>
+            <div class="space-y-3 text-left">
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mt-0.5">
+                        <span class="text-blue-600 text-sm font-medium">1</span>
+                    </div>
+                    <p class="text-gray-700">Check if your payment method has sufficient balance or is valid.</p>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mt-0.5">
+                        <span class="text-blue-600 text-sm font-medium">2</span>
+                    </div>
+                    <p class="text-gray-700">Try using a different payment method (card, UPI, wallet, etc.).</p>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mt-0.5">
+                        <span class="text-blue-600 text-sm font-medium">3</span>
+                    </div>
+                    <p class="text-gray-700">Contact your bank if the issue persists.</p>
+                </div>
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mt-0.5">
+                        <span class="text-blue-600 text-sm font-medium">4</span>
+                    </div>
+                    <p class="text-gray-700">If you need help, please contact our support team.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
+            <a href="{% url 'checkout' %}" 
+               class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Try Again
+            </a>
+            <a href="{% url 'cart' %}" 
+               class="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Back to Cart
+            </a>
+        </div>
+        
+        <div class="mt-8">
+            <p class="text-sm text-gray-500">
+                Need help? Contact us at 
+                <a href="mailto:support@devamproject.com" class="text-blue-600 hover:text-blue-500">
+                    support@devamproject.com
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

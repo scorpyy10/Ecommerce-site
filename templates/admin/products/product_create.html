@@ -1,0 +1,437 @@
+{% extends 'admin/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Add New Product - Admin Dashboard{% endblock %}
+{% block page_title %}Add New Product{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="flex items-center mb-8">
+    <a href="{% url 'admin_panel:product_list' %}" class="text-gray-600 hover:text-gray-900 mr-4">
+        <i class="fas fa-arrow-left text-xl"></i>
+    </a>
+    <div>
+        <h2 class="text-3xl font-bold text-gray-900">Add New Product</h2>
+        <p class="text-gray-600">Create a new product listing for your marketplace</p>
+    </div>
+</div>
+
+<!-- Product Form -->
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Form -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- Basic Information -->
+            <div class="bg-white rounded-2xl shadow-soft p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">
+                    <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                    Basic Information
+                </h3>
+                
+                <div class="space-y-6">
+                    <div>
+                        {{ form.title.label_tag }}
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <div class="mt-2 text-sm text-red-600">{{ form.title.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        {{ form.description.label_tag }}
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="mt-2 text-sm text-red-600">{{ form.description.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            {{ form.price.label_tag }}
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500">₹</span>
+                                </div>
+                                <input type="number" name="price" value="{{ form.price.value|default:'' }}" 
+                                       class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
+                                       placeholder="0.00" step="0.01" min="0" required>
+                            </div>
+                            {% if form.price.errors %}
+                                <div class="mt-2 text-sm text-red-600">{{ form.price.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            {{ form.category.label_tag }}
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <div class="mt-2 text-sm text-red-600">{{ form.category.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        {{ form.tags.label_tag }}
+                        {{ form.tags }}
+                        {% if form.tags.help_text %}
+                            <p class="mt-2 text-sm text-gray-600">{{ form.tags.help_text }}</p>
+                        {% endif %}
+                        {% if form.tags.errors %}
+                            <div class="mt-2 text-sm text-red-600">{{ form.tags.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Media -->
+            <div class="bg-white rounded-2xl shadow-soft p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">
+                    <i class="fas fa-image text-purple-600 mr-2"></i>
+                    Media & Assets
+                </h3>
+                
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            {{ form.featured_image.label_tag }}
+                            {{ form.featured_image }}
+                            {% if form.featured_image.help_text %}
+                                <p class="mt-2 text-sm text-gray-600">{{ form.featured_image.help_text }}</p>
+                            {% endif %}
+                            {% if form.featured_image.errors %}
+                                <div class="mt-2 text-sm text-red-600">{{ form.featured_image.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            {{ form.featured_image_url.label_tag }}
+                            {{ form.featured_image_url }}
+                            {% if form.featured_image_url.help_text %}
+                                <p class="mt-2 text-sm text-gray-600">{{ form.featured_image_url.help_text }}</p>
+                            {% endif %}
+                            {% if form.featured_image_url.errors %}
+                                <div class="mt-2 text-sm text-red-600">{{ form.featured_image_url.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        {{ form.demo_video_url.label_tag }}
+                        {{ form.demo_video_url }}
+                        {% if form.demo_video_url.help_text %}
+                            <p class="mt-2 text-sm text-gray-600">{{ form.demo_video_url.help_text }}</p>
+                        {% endif %}
+                        {% if form.demo_video_url.errors %}
+                            <div class="mt-2 text-sm text-red-600">{{ form.demo_video_url.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gallery Images -->
+            <div class="bg-white rounded-2xl shadow-soft p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">
+                    <i class="fas fa-images text-indigo-600 mr-2"></i>
+                    Gallery Images
+                </h3>
+                
+                <div class="space-y-4">
+                    {{ formset.management_form }}
+                    {% if formset.non_form_errors %}
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <div class="text-sm text-red-600">
+                                {{ formset.non_form_errors }}
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <div id="gallery-formset">
+                        {% for form in formset %}
+                            <div class="gallery-form border border-gray-200 rounded-lg p-4 mb-4">
+                                {{ form.id }}
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        {{ form.image.label_tag }}
+                                        {{ form.image }}
+                                        {% if form.image.errors %}
+                                            <div class="mt-2 text-sm text-red-600">{{ form.image.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div>
+                                        {{ form.image_url.label_tag }}
+                                        {{ form.image_url }}
+                                        {% if form.image_url.help_text %}
+                                            <p class="mt-1 text-xs text-gray-600">{{ form.image_url.help_text }}</p>
+                                        {% endif %}
+                                        {% if form.image_url.errors %}
+                                            <div class="mt-2 text-sm text-red-600">{{ form.image_url.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div>
+                                        {{ form.alt_text.label_tag }}
+                                        {{ form.alt_text }}
+                                        {% if form.alt_text.errors %}
+                                            <div class="mt-2 text-sm text-red-600">{{ form.alt_text.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                {% if form.instance.pk %}
+                                    <div class="mt-4 flex items-center">
+                                        {{ form.DELETE }}
+                                        <label for="{{ form.DELETE.id_for_label }}" class="ml-2 text-sm text-red-600">
+                                            Delete this image
+                                        </label>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% empty %}
+                            <div class="gallery-form border border-gray-200 rounded-lg p-4 mb-4">
+                                <p class="text-gray-500 text-center py-4">
+                                    <i class="fas fa-image text-3xl mb-2"></i><br>
+                                    No gallery images yet. Add some images to showcase your product.
+                                </p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <button type="button" id="add-gallery-form" class="w-full px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>
+                        Add Another Image
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Delivery Options -->
+            <div class="bg-white rounded-2xl shadow-soft p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">
+                    <i class="fas fa-truck text-green-600 mr-2"></i>
+                    Delivery Options
+                </h3>
+                
+                <div class="space-y-6">
+                    <div>
+                        {{ form.delivery_type.label_tag }}
+                        {{ form.delivery_type }}
+                        {% if form.delivery_type.errors %}
+                            <div class="mt-2 text-sm text-red-600">{{ form.delivery_type.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            {{ form.download_file.label_tag }}
+                            {{ form.download_file }}
+                            {% if form.download_file.help_text %}
+                                <p class="mt-2 text-sm text-gray-600">{{ form.download_file.help_text }}</p>
+                            {% endif %}
+                            {% if form.download_file.errors %}
+                                <div class="mt-2 text-sm text-red-600">{{ form.download_file.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            {{ form.download_url.label_tag }}
+                            {{ form.download_url }}
+                            {% if form.download_url.help_text %}
+                                <p class="mt-2 text-sm text-gray-600">{{ form.download_url.help_text }}</p>
+                            {% endif %}
+                            {% if form.download_url.errors %}
+                                <div class="mt-2 text-sm text-red-600">{{ form.download_url.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="space-y-8">
+            <!-- Publish Options -->
+            <div class="bg-white rounded-2xl shadow-soft p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">
+                    <i class="fas fa-cog text-yellow-600 mr-2"></i>
+                    Publish Options
+                </h3>
+                
+                <div class="space-y-6">
+                    <div class="flex items-center">
+                        {{ form.is_active }}
+                        <label for="{{ form.is_active.id_for_label }}" class="ml-3 text-sm font-medium text-gray-700">
+                            {{ form.is_active.label }}
+                        </label>
+                    </div>
+                    {% if form.is_active.help_text %}
+                        <p class="text-sm text-gray-600">{{ form.is_active.help_text }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- SEO -->
+            <div class="bg-white rounded-2xl shadow-soft p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">
+                    <i class="fas fa-search text-indigo-600 mr-2"></i>
+                    SEO Settings
+                </h3>
+                
+                <div>
+                    {{ form.meta_description.label_tag }}
+                    {{ form.meta_description }}
+                    {% if form.meta_description.help_text %}
+                        <p class="mt-2 text-sm text-gray-600">{{ form.meta_description.help_text }}</p>
+                    {% endif %}
+                    {% if form.meta_description.errors %}
+                        <div class="mt-2 text-sm text-red-600">{{ form.meta_description.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-100">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                    <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                    Quick Tips
+                </h3>
+                <ul class="space-y-2 text-sm text-gray-700">
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-green-500 mr-2 mt-0.5 text-xs"></i>
+                        Use high-quality images for better engagement
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-green-500 mr-2 mt-0.5 text-xs"></i>
+                        Write detailed descriptions with key features
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-green-500 mr-2 mt-0.5 text-xs"></i>
+                        Add relevant tags for better searchability
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-check text-green-500 mr-2 mt-0.5 text-xs"></i>
+                        Include demo videos when possible
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Form Actions -->
+    <div class="mt-8 flex items-center justify-between bg-white rounded-2xl shadow-soft p-6">
+        <a href="{% url 'admin_panel:product_list' %}" 
+           class="px-6 py-3 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors font-medium">
+            <i class="fas fa-times mr-2"></i>
+            Cancel
+        </a>
+        
+        <div class="flex items-center space-x-4">
+            <button type="submit" name="action" value="save_draft" 
+                    class="px-6 py-3 text-gray-700 bg-white border-2 border-gray-200 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 font-medium">
+                <i class="fas fa-save mr-2"></i>
+                Save as Draft
+            </button>
+            
+            <button type="submit" name="action" value="publish" 
+                    class="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg">
+                <i class="fas fa-rocket mr-2"></i>
+                Create Product
+            </button>
+        </div>
+    </div>
+    
+    <!-- Form Errors -->
+    {% if form.non_field_errors or formset.non_form_errors %}
+    <div class="mt-6 bg-red-50 border border-red-200 rounded-2xl p-6">
+        <h3 class="text-lg font-semibold text-red-800 mb-4">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            Please fix the following errors:
+        </h3>
+        <ul class="list-disc list-inside space-y-2 text-red-700">
+            {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+            {% for error in formset.non_form_errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-resize textareas
+    document.querySelectorAll('textarea').forEach(textarea => {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    });
+    
+    // Real-time character count for meta description
+    const metaDescField = document.querySelector('input[name="meta_description"]');
+    if (metaDescField) {
+        const charCount = document.createElement('div');
+        charCount.className = 'text-xs text-gray-500 mt-1';
+        metaDescField.parentNode.appendChild(charCount);
+        
+        function updateCharCount() {
+            const count = metaDescField.value.length;
+            charCount.textContent = `${count}/160 characters`;
+            charCount.className = count > 160 ? 'text-xs text-red-500 mt-1' : 'text-xs text-gray-500 mt-1';
+        }
+        
+        metaDescField.addEventListener('input', updateCharCount);
+        updateCharCount(); // Initial count
+    }
+    
+    // Preview functionality for images
+    function previewImage(input, previewId) {
+        const file = input.files[0];
+        const preview = document.getElementById(previewId);
+        
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (!preview) {
+                    const previewImg = document.createElement('img');
+                    previewImg.id = previewId;
+                    previewImg.className = 'mt-2 h-24 w-24 object-cover rounded-lg border border-gray-200';
+                    input.parentNode.appendChild(previewImg);
+                }
+                document.getElementById(previewId).src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    
+    // Add preview for featured image
+    const featuredImageInput = document.querySelector('input[name="featured_image"]');
+    if (featuredImageInput) {
+        featuredImageInput.addEventListener('change', function() {
+            previewImage(this, 'featured-image-preview');
+        });
+    }
+    
+    // Form validation enhancement
+    document.querySelector('form').addEventListener('submit', function(e) {
+        // Let Django handle the validation instead of blocking submission
+        // Just add visual feedback for empty required fields
+        const requiredFields = this.querySelectorAll('input[name="title"], textarea[name="description"], input[name="price"], select[name="category"], select[name="delivery_type"]');
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('border-red-300');
+            } else {
+                field.classList.remove('border-red-300');
+            }
+        });
+        
+        // Don't prevent form submission - let Django handle validation
+    });
+</script>
+{% endblock %}

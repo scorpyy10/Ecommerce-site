@@ -1,0 +1,311 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Products Management - Admin Dashboard{% endblock %}
+{% block page_title %}Products Management{% endblock %}
+
+{% block content %}
+<!-- Header with actions -->
+<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
+    <div>
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">Products</h2>
+        <p class="text-gray-600">Manage your product catalog and inventory</p>
+    </div>
+    
+    <div class="mt-4 lg:mt-0 flex items-center space-x-4">
+        <div class="text-sm text-gray-600">
+            Total: <span class="font-semibold">{{ page_obj.paginator.count }}</span> products
+        </div>
+        <a href="{% url 'admin_panel:product_create' %}" 
+           class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg">
+            <i class="fas fa-plus mr-2"></i>
+            Add Product
+        </a>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-2xl shadow-soft p-6">
+        <div class="flex items-center">
+            <div class="p-3 bg-green-100 rounded-full">
+                <i class="fas fa-check-circle text-2xl text-green-600"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Active Products</p>
+                <p class="text-2xl font-bold text-gray-900">{{ products|length }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-2xl shadow-soft p-6">
+        <div class="flex items-center">
+            <div class="p-3 bg-yellow-100 rounded-full">
+                <i class="fas fa-pause-circle text-2xl text-yellow-600"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Draft Products</p>
+                <p class="text-2xl font-bold text-gray-900">0</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-2xl shadow-soft p-6">
+        <div class="flex items-center">
+            <div class="p-3 bg-blue-100 rounded-full">
+                <i class="fas fa-tags text-2xl text-blue-600"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Categories</p>
+                <p class="text-2xl font-bold text-gray-900">{{ categories.count }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-2xl shadow-soft p-6">
+        <div class="flex items-center">
+            <div class="p-3 bg-purple-100 rounded-full">
+                <i class="fas fa-chart-line text-2xl text-purple-600"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Avg. Price</p>
+                <p class="text-2xl font-bold text-gray-900">₹500</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="bg-white rounded-2xl shadow-soft p-6 mb-8">
+    <form method="GET" class="space-y-4 lg:space-y-0 lg:flex lg:items-end lg:space-x-4">
+        <div class="flex-1">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+            <input type="text" name="search" value="{{ search_query }}" 
+                   placeholder="Search by product name, description, tags..."
+                   class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        </div>
+        
+        <div class="lg:w-48">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+            <select name="category" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="all" {% if current_category == 'all' %}selected{% endif %}>All Categories</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}" {% if current_category|stringformat:"s" == category.id|stringformat:"s" %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="lg:w-48">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select name="status" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="all" {% if current_status == 'all' %}selected{% endif %}>All Status</option>
+                <option value="active" {% if current_status == 'active' %}selected{% endif %}>Active</option>
+                <option value="inactive" {% if current_status == 'inactive' %}selected{% endif %}>Inactive</option>
+            </select>
+        </div>
+        
+        <div class="flex space-x-2">
+            <button type="submit" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium">
+                <i class="fas fa-search mr-2"></i>
+                Filter
+            </button>
+            <a href="{% url 'admin_panel:product_list' %}" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium">
+                <i class="fas fa-times mr-2"></i>
+                Clear
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Products Grid -->
+<div class="bg-white rounded-2xl shadow-soft overflow-hidden">
+    {% if products %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
+        {% for product in products %}
+        <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-200 hover-lift">
+            <!-- Product Image -->
+            <div class="relative h-48 bg-gray-100">
+                {% if product.get_featured_image_url %}
+                    <img src="{{ product.get_featured_image_url }}" alt="{{ product.title }}" 
+                         class="w-full h-full object-cover">
+                {% else %}
+                    <div class="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                        <i class="fas fa-cube text-white text-4xl"></i>
+                    </div>
+                {% endif %}
+                
+                <!-- Status Badge -->
+                <div class="absolute top-3 left-3">
+                    {% if product.is_active %}
+                        <span class="inline-flex px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">
+                            Active
+                        </span>
+                    {% else %}
+                        <span class="inline-flex px-2 py-1 text-xs font-semibold bg-gray-100 text-gray-800 rounded-full">
+                            Inactive
+                        </span>
+                    {% endif %}
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="absolute top-3 right-3 flex space-x-1">
+                    <a href="{% url 'admin_panel:product_edit' product.pk %}" 
+                       class="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors opacity-0 group-hover:opacity-100">
+                        <i class="fas fa-edit text-sm"></i>
+                    </a>
+                    <form method="POST" action="{% url 'admin_panel:toggle_product_status' product.id %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" 
+                                class="p-2 {% if product.is_active %}bg-yellow-600 hover:bg-yellow-700{% else %}bg-green-600 hover:bg-green-700{% endif %} text-white rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+                            <i class="fas {% if product.is_active %}fa-pause{% else %}fa-play{% endif %} text-sm"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Product Info -->
+            <div class="p-6">
+                <div class="mb-4">
+                    <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">{{ product.title }}</h3>
+                    <p class="text-sm text-gray-600 mb-2">{{ product.category.name }}</p>
+                    <p class="text-2xl font-bold text-gray-900">₹{{ product.price }}</p>
+                </div>
+                
+                <div class="mb-4">
+                    <p class="text-sm text-gray-600 line-clamp-2">{{ product.description|truncatewords:15 }}</p>
+                </div>
+                
+                <!-- Tags -->
+                {% if product.tags %}
+                <div class="mb-4">
+                    <div class="flex flex-wrap gap-1">
+                        {% for tag in product.get_tags_list|slice:":3" %}
+                        <span class="inline-flex px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+                            {{ tag }}
+                        </span>
+                        {% endfor %}
+                        {% if product.get_tags_list|length > 3 %}
+                        <span class="inline-flex px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
+                            +{{ product.get_tags_list|length|add:"-3" }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Actions -->
+                <div class="flex items-center justify-between space-x-2">
+                    <a href="{% url 'admin_panel:product_edit' product.pk %}" 
+                       class="flex-1 inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <i class="fas fa-edit mr-1"></i>
+                        Edit
+                    </a>
+                    
+                    <a href="{% url 'project_detail' product.slug %}" target="_blank"
+                       class="flex-1 inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-external-link-alt mr-1"></i>
+                        View
+                    </a>
+                    
+                    <form method="POST" action="{% url 'admin_panel:delete_product' product.id %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" data-confirm="Are you sure you want to delete this product?"
+                                class="p-2 text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
+                            <i class="fas fa-trash text-sm"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+        <div class="flex items-center justify-between">
+            <div class="text-sm text-gray-700">
+                Showing 
+                <span class="font-medium">{{ page_obj.start_index }}</span>
+                to 
+                <span class="font-medium">{{ page_obj.end_index }}</span>
+                of 
+                <span class="font-medium">{{ page_obj.paginator.count }}</span>
+                results
+            </div>
+            
+            <nav class="flex items-center space-x-2">
+                {% if page_obj.has_previous %}
+                <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                   class="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    <i class="fas fa-angle-double-left"></i>
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                   class="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+                {% endif %}
+                
+                <span class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg">
+                    {{ page_obj.number }}
+                </span>
+                
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                   class="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                   class="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    <i class="fas fa-angle-double-right"></i>
+                </a>
+                {% endif %}
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-16">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+            <i class="fas fa-cube text-2xl text-gray-400"></i>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No products found</h3>
+        <p class="text-gray-600 mb-6">
+            {% if search_query or current_category != 'all' or current_status != 'all' %}
+                Try adjusting your filters to see more results.
+            {% else %}
+                Get started by creating your first product.
+            {% endif %}
+        </p>
+        {% if search_query or current_category != 'all' or current_status != 'all' %}
+        <a href="{% url 'admin_panel:product_list' %}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors mr-4">
+            <i class="fas fa-times mr-2"></i>
+            Clear Filters
+        </a>
+        {% endif %}
+        <a href="{% url 'admin_panel:product_create' %}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200">
+            <i class="fas fa-plus mr-2"></i>
+            Add First Product
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .group:hover .group-hover\:opacity-100 {
+        opacity: 1;
+    }
+</style>
+{% endblock %}

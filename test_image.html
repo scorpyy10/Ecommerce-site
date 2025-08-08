@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Drive Image Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+        .test-container { 
+            border: 2px solid #ddd; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 8px; 
+        }
+        .success { border-color: #4CAF50; background-color: #f9fff9; }
+        .error { border-color: #f44336; background-color: #fff9f9; }
+        .info { border-color: #2196F3; background-color: #f9f9ff; }
+        img { max-width: 100%; height: auto; margin: 10px 0; }
+        .url-display { 
+            background: #f5f5f5; 
+            padding: 10px; 
+            border-radius: 4px; 
+            word-break: break-all; 
+            font-family: monospace; 
+            font-size: 12px; 
+        }
+        .error-msg { color: #f44336; font-weight: bold; }
+        .success-msg { color: #4CAF50; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Google Drive Image Integration Test</h1>
+    
+    <div class="test-container info">
+        <h2>📋 Test Results</h2>
+        <p>This page tests Google Drive image loading with different URL formats.</p>
+    </div>
+
+    <!-- Test 1: Original Sharing URL -->
+    <div class="test-container" id="test1">
+        <h3>Test 1: Original Google Drive Sharing URL</h3>
+        <div class="url-display">https://drive.google.com/file/d/1NQG5v98Jc_OhDm2WT5-rxSxT7IQSjira/view?usp=sharing</div>
+        <img src="https://drive.google.com/file/d/1NQG5v98Jc_OhDm2WT5-rxSxT7IQSjira/view?usp=sharing" 
+             alt="Test 1" 
+             onload="markSuccess('test1')" 
+             onerror="markError('test1', 'Original sharing URL failed')">
+        <div class="result" id="result1"></div>
+    </div>
+
+    <!-- Test 2: Old Format -->
+    <div class="test-container" id="test2">
+        <h3>Test 2: Old Google Drive Format (uc?export=view)</h3>
+        <div class="url-display">https://drive.google.com/uc?export=view&id=1NQG5v98Jc_OhDm2WT5-rxSxT7IQSjira</div>
+        <img src="https://drive.google.com/uc?export=view&id=1NQG5v98Jc_OhDm2WT5-rxSxT7IQSjira" 
+             alt="Test 2" 
+             onload="markSuccess('test2')" 
+             onerror="markError('test2', 'Old format failed')">
+        <div class="result" id="result2"></div>
+    </div>
+
+    <!-- Test 3: New Format -->
+    <div class="test-container" id="test3">
+        <h3>Test 3: New Google Drive Format (usercontent.google.com)</h3>
+        <div class="url-display">https://drive.usercontent.google.com/download?id=1NQG5v98Jc_OhDm2WT5-rxSxT7IQSjira&export=view</div>
+        <img src="https://drive.usercontent.google.com/download?id=1NQG5v98Jc_OhDm2WT5-rxSxT7IQSjira&export=view" 
+             alt="Test 3" 
+             onload="markSuccess('test3')" 
+             onerror="markError('test3', 'New format failed')">
+        <div class="result" id="result3"></div>
+    </div>
+
+    <!-- YouTube Test -->
+    <div class="test-container info">
+        <h3>🎥 YouTube Video Test</h3>
+        <p><strong>Original URL:</strong></p>
+        <div class="url-display">https://www.youtube.com/watch?v=hNHHCs03m1k</div>
+        <p><strong>Converted Embed URL:</strong></p>
+        <div class="url-display">https://www.youtube.com/embed/hNHHCs03m1k</div>
+        
+        <div style="position: relative; width: 100%; height: 0; padding-bottom: 56.25%; margin: 20px 0;">
+            <iframe src="https://www.youtube.com/embed/hNHHCs03m1k" 
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 8px;"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <div class="test-container info">
+        <h2>🛠️ Troubleshooting Tips</h2>
+        <ol>
+            <li><strong>Check Sharing Settings:</strong> Make sure your Google Drive file is set to "Anyone with the link can view"</li>
+            <li><strong>File Format:</strong> Ensure the file is a valid image format (JPG, PNG, GIF, WebP)</li>
+            <li><strong>File Size:</strong> Very large files (>10MB) might load slowly</li>
+            <li><strong>Browser Issues:</strong> Try refreshing the page or opening in incognito mode</li>
+            <li><strong>Google Drive Limits:</strong> Google may limit access if too many requests are made</li>
+        </ol>
+    </div>
+
+    <script>
+        function markSuccess(testId) {
+            const container = document.getElementById(testId);
+            const result = document.getElementById('result' + testId.slice(-1));
+            container.classList.add('success');
+            result.innerHTML = '<div class="success-msg">✅ SUCCESS: Image loaded successfully!</div>';
+        }
+
+        function markError(testId, message) {
+            const container = document.getElementById(testId);
+            const result = document.getElementById('result' + testId.slice(-1));
+            container.classList.add('error');
+            result.innerHTML = `<div class="error-msg">❌ ERROR: ${message}</div>`;
+        }
+
+        // Add loading timeout for better debugging
+        setTimeout(() => {
+            document.querySelectorAll('img').forEach((img, index) => {
+                if (!img.complete || img.naturalHeight === 0) {
+                    const testId = `test${index + 1}`;
+                    markError(testId, 'Image loading timeout (10 seconds)');
+                }
+            });
+        }, 10000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.title }} - Devam Project{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <nav class="flex mb-8" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a href="{% url 'home' %}" class="text-gray-700 hover:text-blue-600">Home</a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                    <a href="{% url 'project_list' %}" class="text-gray-700 hover:text-blue-600">Projects</a>
+                </div>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                    <a href="{% url 'category_projects' project.category.slug %}" class="text-gray-700 hover:text-blue-600">{{ project.category.name }}</a>
+                </div>
+            </li>
+            <li aria-current="page">
+                <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                    <span class="text-gray-500">{{ project.title }}</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+    <div class="lg:flex lg:space-x-8">
+        <!-- Image Gallery -->
+        <div class="lg:w-1/2 mb-8 lg:mb-0">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                {% if project.get_featured_image_url %}
+                <img src="{{ project.get_featured_image_url }}" alt="{{ project.title }}" 
+                     class="w-full h-96 object-cover" id="mainImage" 
+                     crossorigin="anonymous"
+                     onerror="console.log('Image failed to load:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex'; this.nextElementSibling.nextElementSibling.style.display='block';">
+                <div class="w-full h-96 bg-gray-200 flex items-center justify-center" style="display:none;">
+                    <i class="fas fa-image text-gray-400 text-6xl"></i>
+                </div>
+                <div class="p-4 text-center text-sm text-gray-500" style="display:none;">
+                    <p>🔗 <strong>Google Drive Image URL:</strong></p>
+                    <p class="break-all">{{ project.get_featured_image_url }}</p>
+                    <p class="mt-2">If you can't see the image, please check if your Google Drive link is set to "Anyone with the link can view"</p>
+                </div>
+                {% else %}
+                <div class="w-full h-96 bg-gray-200 flex items-center justify-center">
+                    <i class="fas fa-image text-gray-400 text-6xl"></i>
+                    <div class="ml-4 text-center">
+                        <p class="text-gray-600">No image available</p>
+                        <p class="text-sm text-gray-500">Add a featured image or Google Drive link</p>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Additional Images -->
+                {% if project.get_featured_image_url or project.images.all %}
+                <div class="p-4">
+                    <div class="flex space-x-2 overflow-x-auto">
+                        {% if project.get_featured_image_url %}
+                        <img src="{{ project.get_featured_image_url }}" alt="{{ project.title }}" 
+                             class="w-20 h-20 object-cover rounded cursor-pointer border-2 border-blue-500"
+                             onclick="changeMainImage('{{ project.get_featured_image_url }}')"
+                             onerror="this.style.display='none';">
+                        {% endif %}
+                        {% for image in project.images.all %}
+                        {% if image.get_image_url %}
+                        <img src="{{ image.get_image_url }}" alt="{{ image.alt_text }}" 
+                             class="w-20 h-20 object-cover rounded cursor-pointer border-2 border-transparent hover:border-blue-500"
+                             onclick="changeMainImage('{{ image.get_image_url }}')"
+                             onerror="this.style.display='none';">
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Demo Video -->
+            {% if project.get_embed_video_url %}
+            <div class="mt-6 bg-white rounded-lg shadow-md p-4">
+                <h3 class="text-lg font-semibold mb-3">Demo Video</h3>
+                <div class="relative w-full h-0" style="padding-bottom: 56.25%;">
+                    <iframe src="{{ project.get_embed_video_url }}" 
+                            class="absolute inset-0 w-full h-full rounded-lg"
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen></iframe>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Product Info -->
+        <div class="lg:w-1/2">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="mb-4">
+                    <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                        {{ project.category.name }}
+                    </span>
+                </div>
+                
+                <h1 class="text-3xl font-bold text-gray-800 mb-4">{{ project.title }}</h1>
+                
+                <div class="text-3xl font-bold text-blue-600 mb-6">₹{{ project.price }}</div>
+                
+                <div class="prose max-w-none mb-6">
+                    <p class="text-gray-700 leading-relaxed">{{ project.description }}</p>
+                </div>
+                
+                <!-- Tags -->
+                {% if project.tags %}
+                <div class="mb-6">
+                    <h3 class="text-sm font-medium text-gray-800 mb-2">Tags:</h3>
+                    <div class="flex flex-wrap gap-2">
+                        {% for tag in project.get_tags_list %}
+                        <span class="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">
+                            {{ tag }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Delivery Information -->
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="text-sm font-medium text-gray-800 mb-2">Delivery Information:</h3>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <i class="fas fa-truck mr-2"></i>
+                        {% if project.delivery_type == 'download' %}
+                            Digital Download - Instant delivery after payment
+                        {% elif project.delivery_type == 'email' %}
+                            Email Delivery - Files sent within 24 hours
+                        {% else %}
+                            Physical Delivery - Shipping within 3-5 business days
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Add to Cart -->
+                <div class="flex space-x-4">
+                    <form method="POST" action="{% url 'add_to_cart' project.id %}" class="flex-1">
+                        {% csrf_token %}
+                        <button type="submit" 
+                                class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition duration-200 flex items-center justify-center">
+                            <i class="fas fa-shopping-cart mr-2"></i>
+                            Add to Cart
+                        </button>
+                    </form>
+                    
+                    <button onclick="toggleWishlist()" 
+                            class="bg-gray-200 text-gray-600 py-3 px-6 rounded-lg hover:bg-gray-300 transition duration-200">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+                
+                <!-- Additional Info -->
+                <div class="mt-6 pt-6 border-t border-gray-200">
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="font-medium text-gray-800">Created:</span>
+                            <span class="text-gray-600">{{ project.created_at|date:"M j, Y" }}</span>
+                        </div>
+                        <div>
+                            <span class="font-medium text-gray-800">Last Updated:</span>
+                            <span class="text-gray-600">{{ project.updated_at|date:"M j, Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Related Products -->
+    {% if related_projects %}
+    <div class="mt-12">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Related Projects</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for related_project in related_projects %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+                {% if related_project.get_featured_image_url %}
+                <img src="{{ related_project.get_featured_image_url }}" alt="{{ related_project.title }}" 
+                     class="w-full h-48 object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="w-full h-48 bg-gray-200 flex items-center justify-center" style="display:none;">
+                    <i class="fas fa-image text-gray-400 text-3xl"></i>
+                </div>
+                {% else %}
+                <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                    <i class="fas fa-image text-gray-400 text-3xl"></i>
+                </div>
+                {% endif %}
+                
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ related_project.title }}</h3>
+                    <p class="text-gray-700 text-sm mb-3">{{ related_project.description|truncatewords:15 }}</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xl font-bold text-blue-600">₹{{ related_project.price }}</span>
+                        <a href="{% url 'project_detail' related_project.slug %}" 
+                           class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 transition duration-200">
+                            View
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function changeMainImage(imageUrl) {
+    document.getElementById('mainImage').src = imageUrl;
+    // Update border on thumbnails
+    document.querySelectorAll('.cursor-pointer').forEach(img => {
+        img.classList.remove('border-blue-500');
+        img.classList.add('border-transparent');
+    });
+    event.target.classList.remove('border-transparent');
+    event.target.classList.add('border-blue-500');
+}
+
+function toggleWishlist() {
+    // Add wishlist functionality here
+    alert('Wishlist functionality would be implemented here');
+}
+</script>
+{% endblock %}

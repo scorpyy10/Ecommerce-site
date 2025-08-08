@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results{% if query %} for "{{ query }}"{% endif %} - Devam Project{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="mb-12 text-center">
+        <h1 class="text-4xl font-bold text-gradient mb-4">
+            Search Results{% if query %} for "{{ query }}"{% endif %}
+        </h1>
+        {% if projects %}
+        <p class="text-lg text-gray-600 font-medium">Found {{ projects|length }} project{{ projects|length|pluralize }}</p>
+        {% endif %}
+    </div>
+    
+    {% if projects %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        {% for project in projects %}
+        <div class="bg-white rounded-lg shadow-lg hover:shadow-xl overflow-hidden transform transition-all duration-300 hover:scale-105">
+            {% if project.get_featured_image_url %}
+            <img src="{{ project.get_featured_image_url }}" alt="{{ project.title }}" class="w-full h-52 object-cover">
+            {% else %}
+            <div class="w-full h-52 bg-gray-200 flex items-center justify-center">
+                <i class="fas fa-image text-gray-400 text-4xl"></i>
+            </div>
+            {% endif %}
+            
+            <div class="p-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-3">{{ project.title }}</h3>
+                <p class="text-gray-600 text-base mb-3">{{ project.category.name }}</p>
+                <p class="text-gray-700 text-sm mb-4 line-clamp-2">{{ project.description|truncatewords:20 }}</p>
+                
+                <div class="flex flex-col space-y-3">
+                    <span class="text-2xl font-bold text-blue-600">₹{{ project.price }}</span>
+                    <div class="flex flex-col space-y-2">
+                        <a href="{% url 'project_detail' project.slug %}" 
+                           class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition duration-300 text-center">
+                            View Details
+                        </a>
+                        <form method="POST" action="{% url 'add_to_cart' project.id %}">
+                            {% csrf_token %}
+                            <button type="submit" 
+                                    class="w-full bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition duration-300">
+                                Add to Cart
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+{% if is_paginated %}
+    <div class="mt-12 flex justify-center">
+        <nav class="flex space-x-4">
+            {% if page_obj.has_previous %}
+            <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}" 
+               class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 transition duration-200">
+                Previous
+            </a>
+            {% endif %}
+            
+            <span class="px-4 py-2 text-base text-gray-700">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+            <a href="?q={{ query }}&page={{ page_obj.next_page_number }}" 
+               class="px-4 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 transition duration-200">
+                Next
+            </a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+    
+    {% else %}
+<div class="text-center py-16">
+        <div class="text-gray-400 mb-6">
+            <i class="fas fa-search text-7xl"></i>
+        </div>
+        <h3 class="text-2xl font-medium text-gray-800 mb-4">No projects found</h3>
+        {% if query %}
+        <p class="text-gray-600 mb-8">No projects match your search for "{{ query }}".</p>
+        {% else %}
+        <p class="text-gray-600 mb-8">Please enter a search term.</p>
+        {% endif %}
+        <a href="{% url 'project_list' %}" 
+           class="bg-blue-600 text-white py-3 px-8 rounded-xl hover:bg-blue-700 transition duration-300">
+            Browse All Projects
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

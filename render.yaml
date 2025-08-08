@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: devam-marketplace
+    env: python
+    plan: free
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+    startCommand: gunicorn devam_marketplace.wsgi:application --workers=3 --timeout=120
+    autoDeploy: true
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        # Will be set to Render hostname at deploy time (e.g., devam-marketplace.onrender.com)
+        value: "localhost,127.0.0.1"
+      - key: CSRF_TRUSTED_ORIGINS
+        # Set after the first deploy to: https://<your-service>.onrender.com
+        value: ""
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: dev-postgres
+          property: connectionString
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+    healthCheckPath: /
+    # Optionally set these if you serve static files directly
+    # numInstances: 1
+    # region: oregon
+
+# Free Postgres database for demo purposes
+# Render creates DATABASE_URL env var for the web service from this resource
+# Name used above in fromDatabase.name must match this database name
+# You can rename as you like
+
+# IMPORTANT: Free Postgres on Render sleeps when idle; expect cold starts.
+databases:
+  - name: dev-postgres
+    plan: free

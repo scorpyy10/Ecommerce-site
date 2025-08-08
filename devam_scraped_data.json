@@ -1,0 +1,321 @@
+{
+  "source_url": "https://www.devamproject.com",
+  "scraped_at": "Sun, 03 Aug 2025 18:47:49 GMT",
+  "images": [
+    {
+      "url": "https://www.devamproject.com/assets/img/logo/logo-sm.svg",
+      "alt": "logo-sm",
+      "title": "",
+      "original_src": "assets/img/logo/logo-sm.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/logo/logo.svg",
+      "alt": "logo",
+      "title": "",
+      "original_src": "assets/img/logo/logo.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/logo/logo.svg",
+      "alt": "logo",
+      "title": "",
+      "original_src": "assets/img/logo/logo.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/logo/logo.svg",
+      "alt": "logo",
+      "title": "",
+      "original_src": "assets/img/logo/logo.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/shape/banner-shape-2.png",
+      "alt": "banner-shape",
+      "title": "",
+      "original_src": "assets/img/shape/banner-shape-2.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/shape/banner-shape-1.svg",
+      "alt": "banner-shape",
+      "title": "",
+      "original_src": "assets/img/shape/banner-shape-1.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/banner/banner-img-1.png",
+      "alt": "banner-img",
+      "title": "",
+      "original_src": "assets/img/banner/banner-img-1.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/features/feature-img-1.png",
+      "alt": "about-img",
+      "title": "",
+      "original_src": "assets/img/features/feature-img-1.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/features/feature-img-2.png",
+      "alt": "about-img",
+      "title": "",
+      "original_src": "assets/img/features/feature-img-2.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/feature-icon-1.svg",
+      "alt": "feature-icon",
+      "title": "",
+      "original_src": "assets/img/icons/feature-icon-1.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/feature-icon-2.svg",
+      "alt": "feature-icon",
+      "title": "",
+      "original_src": "assets/img/icons/feature-icon-2.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/feature-icon-3.svg",
+      "alt": "feature-icon",
+      "title": "",
+      "original_src": "assets/img/icons/feature-icon-3.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/service-icon-1.svg",
+      "alt": "service-icon",
+      "title": "",
+      "original_src": "assets/img/icons/service-icon-1.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/service-icon-2.svg",
+      "alt": "service-icon",
+      "title": "",
+      "original_src": "assets/img/icons/service-icon-2.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/service-icon-3.svg",
+      "alt": "service-icon",
+      "title": "",
+      "original_src": "assets/img/icons/service-icon-3.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/service-icon-1.svg",
+      "alt": "service-icon",
+      "title": "",
+      "original_src": "assets/img/icons/service-icon-1.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/service-icon-2.svg",
+      "alt": "service-icon",
+      "title": "",
+      "original_src": "assets/img/icons/service-icon-2.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/service-icon-3.svg",
+      "alt": "service-icon",
+      "title": "",
+      "original_src": "assets/img/icons/service-icon-3.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/images/counter-image.png",
+      "alt": "counter-image",
+      "title": "",
+      "original_src": "assets/img/images/counter-image.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/team/team-img-1.png",
+      "alt": "team-img",
+      "title": "",
+      "original_src": "assets/img/team/team-img-1.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/team/team-img-2.png",
+      "alt": "team-img",
+      "title": "",
+      "original_src": "assets/img/team/team-img-2.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/team/team-img-3.png",
+      "alt": "team-img",
+      "title": "",
+      "original_src": "assets/img/team/team-img-3.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/images/message-img.png",
+      "alt": "message-image",
+      "title": "",
+      "original_src": "assets/img/images/message-img.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/mail-icon.svg",
+      "alt": "mail-icon",
+      "title": "",
+      "original_src": "assets/img/icons/mail-icon.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/testimonial/testimonial-img-1.png",
+      "alt": "testimonial-img",
+      "title": "",
+      "original_src": "assets/img/testimonial/testimonial-img-1.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/quote-icon.svg",
+      "alt": "quote-icon",
+      "title": "",
+      "original_src": "assets/img/icons/quote-icon.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/testimonial/testimonial-2.png",
+      "alt": "testimonial-img",
+      "title": "",
+      "original_src": "assets/img/testimonial/testimonial-2.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/quote-icon.svg",
+      "alt": "quote-icon",
+      "title": "",
+      "original_src": "assets/img/icons/quote-icon.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/projects/project-img1.png",
+      "alt": "project-img",
+      "title": "",
+      "original_src": "assets/img/projects/project-img1.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/projects/project-img3.png",
+      "alt": "project-img",
+      "title": "",
+      "original_src": "assets/img/projects/project-img3.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/projects/project-img2.png",
+      "alt": "project-img",
+      "title": "",
+      "original_src": "assets/img/projects/project-img2.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/projects/project-img4.png",
+      "alt": "project-img",
+      "title": "",
+      "original_src": "assets/img/projects/project-img4.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/globe-icon.svg",
+      "alt": "globe-icon",
+      "title": "",
+      "original_src": "assets/img/icons/globe-icon.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/globe-icon.svg",
+      "alt": "globe-icon",
+      "title": "",
+      "original_src": "assets/img/icons/globe-icon.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/globe-icon.svg",
+      "alt": "globe-icon",
+      "title": "",
+      "original_src": "assets/img/icons/globe-icon.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/globe-icon.svg",
+      "alt": "globe-icon",
+      "title": "",
+      "original_src": "assets/img/icons/globe-icon.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/globe-icon.svg",
+      "alt": "globe-icon",
+      "title": "",
+      "original_src": "assets/img/icons/globe-icon.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/globe-icon.svg",
+      "alt": "globe-icon",
+      "title": "",
+      "original_src": "assets/img/icons/globe-icon.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/globe-icon.svg",
+      "alt": "globe-icon",
+      "title": "",
+      "original_src": "assets/img/icons/globe-icon.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/globe-icon.svg",
+      "alt": "globe-icon",
+      "title": "",
+      "original_src": "assets/img/icons/globe-icon.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/globe-icon.svg",
+      "alt": "globe-icon",
+      "title": "",
+      "original_src": "assets/img/icons/globe-icon.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/globe-icon.svg",
+      "alt": "globe-icon",
+      "title": "",
+      "original_src": "assets/img/icons/globe-icon.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/faq/faq-img-1.png",
+      "alt": "faq-img",
+      "title": "",
+      "original_src": "assets/img/faq/faq-img-1.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/faq/faq-img-2.png",
+      "alt": "faq-img",
+      "title": "",
+      "original_src": "assets/img/faq/faq-img-2.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/group-person-icon.svg",
+      "alt": "group-person-icon",
+      "title": "",
+      "original_src": "assets/img/icons/group-person-icon.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/blog/blog-img-1.png",
+      "alt": "blog-img",
+      "title": "",
+      "original_src": "assets/img/blog/blog-img-1.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/blog/blog-img-2.png",
+      "alt": "blog-img",
+      "title": "",
+      "original_src": "assets/img/blog/blog-img-2.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/blog/blog-img-3.png",
+      "alt": "blog-img",
+      "title": "",
+      "original_src": "assets/img/blog/blog-img-3.png"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/footer-short-icon-1.svg",
+      "alt": "footer-short-icon",
+      "title": "",
+      "original_src": "assets/img/icons/footer-short-icon-1.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/footer-short-icon-2.svg",
+      "alt": "footer-short-icon",
+      "title": "",
+      "original_src": "assets/img/icons/footer-short-icon-2.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/icons/footer-short-icon-3.svg",
+      "alt": "footer-short-icon",
+      "title": "",
+      "original_src": "assets/img/icons/footer-short-icon-3.svg"
+    },
+    {
+      "url": "https://www.devamproject.com/assets/img/logo/logo2.svg",
+      "alt": "logo2",
+      "title": "",
+      "original_src": "assets/img/logo/logo2.svg"
+    }
+  ],
+  "videos": [],
+  "total_images": 52,
+  "total_videos": 0
+}

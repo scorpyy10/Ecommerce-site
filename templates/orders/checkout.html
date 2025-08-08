@@ -1,0 +1,470 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Review & Payment - Devam Marketplace{% endblock %}
+
+{% block content %}
+{% if redirect_to_delivery %}
+<script>
+    window.location.href = "{% url 'delivery_info' %}";
+</script>
+{% endif %}
+
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Payment Status Messages -->
+                <div id="payment-message-container" class="hidden">
+                    <div id="payment-message" class="rounded-lg p-4 mb-6">
+                        <div class="flex items-center">
+                            <div id="payment-message-icon" class="flex-shrink-0 mr-3">
+                                <!-- Icon will be inserted here -->
+                            </div>
+                            <div id="payment-message-text" class="text-sm font-medium">
+                                <!-- Message text will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="bg-white rounded-2xl shadow-soft p-6">
+                    <div class="relative">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center text-green-600">
+                                <div class="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="font-medium">Delivery Info</span>
+                            </div>
+                            <div class="flex items-center text-blue-600">
+                                <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+                                    2
+                                </div>
+                                <span class="font-medium">Review & Payment</span>
+                            </div>
+                            <div class="flex items-center text-gray-400">
+                                <div class="w-8 h-8 bg-gray-200 text-gray-500 rounded-full flex items-center justify-center text-sm font-semibold mr-3">
+                                    3
+                                </div>
+                                <span class="font-medium">Confirmation</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full transition-all duration-500" style="width: 66%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delivery Information Review -->
+                <div class="bg-white rounded-2xl shadow-soft overflow-hidden hover-lift">
+                    <div class="bg-gradient-to-r from-green-600 to-emerald-600 text-white p-6 flex justify-between items-center">
+                        <h5 class="text-lg font-semibold flex items-center">
+                            <i class="fas fa-check-circle mr-3"></i>
+                            Delivery Information
+                        </h5>
+                        <a href="{% url 'delivery_info' %}" class="inline-flex items-center px-4 py-2 bg-white text-green-600 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                            <i class="fas fa-edit mr-2"></i>Edit
+                        </a>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h6 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                    <i class="fas fa-user text-blue-600 mr-3"></i>Contact Details
+                                </h6>
+                                <div class="space-y-2">
+                                    <p class="font-semibold text-gray-900">{{ address_data.delivery_first_name }} {{ address_data.delivery_last_name }}</p>
+                                    {% if address_data.delivery_company %}
+                                        <p class="text-gray-600">{{ address_data.delivery_company }}</p>
+                                    {% endif %}
+                                    <p class="text-gray-600 flex items-center">
+                                        <i class="fas fa-phone text-blue-600 mr-2"></i>{{ address_data.delivery_phone }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div>
+                                <h6 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                    <i class="fas fa-map-marker-alt text-blue-600 mr-3"></i>Delivery Address
+                                </h6>
+                                <address class="text-gray-600 not-italic leading-relaxed">
+                                    {{ address_data.delivery_address_line_1 }}<br>
+                                    {% if address_data.delivery_address_line_2 %}
+                                        {{ address_data.delivery_address_line_2 }}<br>
+                                    {% endif %}
+                                    {{ address_data.delivery_city }}, {{ address_data.delivery_state }} {{ address_data.delivery_postal_code }}<br>
+                                    {{ address_data.delivery_country }}
+                                </address>
+                                {% if address_data.delivery_instructions %}
+                                    <div class="mt-3 p-3 bg-blue-50 rounded-lg">
+                                        <small class="text-blue-700 flex items-start">
+                                            <i class="fas fa-info-circle mr-2 mt-0.5"></i>
+                                            {{ address_data.delivery_instructions }}
+                                        </small>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <span class="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                                <i class="fas fa-clock mr-2"></i>
+                                Preferred Time: {{ address_data.get_preferred_delivery_time_display|default:address_data.preferred_delivery_time }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="bg-white rounded-2xl shadow-soft overflow-hidden hover-lift">
+                    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
+                        <h5 class="text-lg font-semibold flex items-center">
+                            <i class="fas fa-shopping-cart mr-3"></i>
+                            Order Summary
+                        </h5>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-6">
+                            {% for item in cart_items %}
+                                <div class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <div class="flex-shrink-0">
+                                        {% if item.project.get_featured_image_url %}
+                                            <img src="{{ item.project.get_featured_image_url }}" 
+                                                 alt="{{ item.project.title }}" 
+                                                 class="w-20 h-20 object-cover rounded-lg shadow-sm">
+                                        {% else %}
+                                            <div class="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center">
+                                                <i class="fas fa-image text-gray-400 text-xl"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="ml-6 flex-1">
+                                        <h6 class="font-semibold text-gray-900 mb-2">
+                                            <a href="{% url 'project_detail' item.project.slug %}" 
+                                               class="hover:text-blue-600 transition-colors">{{ item.project.title }}</a>
+                                        </h6>
+                                        <p class="text-gray-600 text-sm mb-3">{{ item.project.description|truncatechars:80 }}</p>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-gray-500">Qty: {{ item.quantity }}</span>
+                                            <strong class="text-xl font-bold text-blue-600">₹{{ item.get_total_price }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-6 border-t">
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-gray-600">
+                                <span>Subtotal ({{ cart.get_total_items }} item{{ cart.get_total_items|pluralize }}):</span>
+                                <strong class="text-gray-900">₹{{ cart.get_total_price }}</strong>
+                            </div>
+                            <div class="flex justify-between text-gray-600">
+                                <span>Delivery:</span>
+                                <span class="text-green-600 font-semibold flex items-center">
+                                    <i class="fas fa-check-circle mr-1"></i>Free
+                                </span>
+                            </div>
+                            <div class="flex justify-between text-gray-600">
+                                <span>Tax:</span>
+                                <span class="text-gray-900 font-semibold">₹0.00</span>
+                            </div>
+                            <hr class="my-4">
+                            <div class="flex justify-between items-center">
+                                <strong class="text-xl text-gray-900">Total:</strong>
+                                <strong class="text-3xl font-bold text-blue-600">₹{{ cart.get_total_price }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Section -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-2xl shadow-soft sticky top-24 overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
+                        <h5 class="text-lg font-semibold flex items-center">
+                            <i class="fas fa-credit-card mr-3"></i>
+                            Payment
+                        </h5>
+                    </div>
+                    <div class="p-6">
+                        <div class="text-center mb-6">
+                            <h4 class="text-3xl font-bold text-blue-600 mb-1">₹{{ cart.get_total_price }}</h4>
+                            <small class="text-gray-500">Total Amount</small>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <div class="flex items-center text-blue-700 mb-2">
+                                    <i class="fas fa-shield-alt mr-2"></i>
+                                    <strong>Secure Payment</strong>
+                                </div>
+                                <small class="text-blue-600">Your payment information is encrypted and secure.</small>
+                            </div>
+                        </div>
+
+                        <button id="pay-button" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-6 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-purple-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 mb-4">
+                            <i class="fas fa-lock mr-2"></i>
+                            Pay ₹{{ cart.get_total_price }}
+                        </button>
+
+                        <div class="text-center mb-4">
+                            <img src="https://razorpay.com/assets/razorpay-glyph.svg" alt="Razorpay" class="h-5 inline mr-2">
+                            <small class="text-gray-500">Powered by Razorpay</small>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="text-center">
+                            <small class="text-gray-500 flex items-center justify-center">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                You will be redirected to Razorpay for secure payment. 
+                                Please ensure pop-ups are enabled.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 text-center border-t">
+                        <a href="{% url 'delivery_info' %}" class="inline-flex items-center px-4 py-2 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-arrow-left mr-2"></i>Back to Delivery Info
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Razorpay Checkout Script with Error Handling -->
+<script>
+// Function to show payment status messages
+function showPaymentMessage(message, type) {
+    const container = document.getElementById('payment-message-container');
+    const messageDiv = document.getElementById('payment-message');
+    const iconDiv = document.getElementById('payment-message-icon');
+    const textDiv = document.getElementById('payment-message-text');
+    
+    // Clear existing classes and content
+    messageDiv.className = 'rounded-lg p-4 mb-6';
+    iconDiv.innerHTML = '';
+    textDiv.textContent = message;
+    
+    // Set styles based on message type
+    if (type === 'success') {
+        messageDiv.classList.add('bg-green-50', 'border', 'border-green-200');
+        textDiv.classList.add('text-green-800');
+        iconDiv.innerHTML = '<div class="w-5 h-5 text-green-400"><i class="fas fa-check-circle"></i></div>';
+    } else if (type === 'error') {
+        messageDiv.classList.add('bg-red-50', 'border', 'border-red-200');
+        textDiv.classList.add('text-red-800');
+        iconDiv.innerHTML = '<div class="w-5 h-5 text-red-400"><i class="fas fa-exclamation-circle"></i></div>';
+    } else if (type === 'info') {
+        messageDiv.classList.add('bg-blue-50', 'border', 'border-blue-200');
+        textDiv.classList.add('text-blue-800');
+        iconDiv.innerHTML = '<div class="w-5 h-5 text-blue-400"><i class="fas fa-info-circle"></i></div>';
+    }
+    
+    // Show the message
+    container.classList.remove('hidden');
+    
+    // Scroll to message
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Load Razorpay script dynamically to handle errors
+function loadRazorpayScript() {
+    return new Promise((resolve, reject) => {
+        if (window.Razorpay) {
+            resolve(window.Razorpay);
+            return;
+        }
+        
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.async = true;
+        
+        script.onload = () => {
+            if (window.Razorpay) {
+                resolve(window.Razorpay);
+            } else {
+                reject(new Error('Razorpay script loaded but Razorpay object not found'));
+            }
+        };
+        
+        script.onerror = () => {
+            reject(new Error('Failed to load Razorpay script'));
+        };
+        
+        document.head.appendChild(script);
+    });
+}
+
+// Initialize payment button click handler
+document.addEventListener('DOMContentLoaded', function() {
+    const payButton = document.getElementById('pay-button');
+    if (!payButton) return;
+    
+    payButton.addEventListener('click', async function() {
+        // Disable button to prevent multiple clicks
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Loading...';
+        
+        try {
+            // Load Razorpay script first
+            await loadRazorpayScript();
+            
+            // Update button text
+            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating order...';
+            
+            // Create Razorpay order
+            const response = await fetch('{% url "create_payment" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                credentials: 'same-origin'
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            // Initialize Razorpay payment
+            const options = {
+                "key": "{{ razorpay_key_id }}",
+                "amount": data.amount,
+                "currency": data.currency,
+                "name": data.name,
+                "description": data.description,
+                "order_id": data.order_id,
+                // Prevent Razorpay from auto-redirecting/new window after payment
+                "redirect": false,
+                "handler": function (response) {
+                    // Capture button reference for proper context
+                    const payButton = document.querySelector('#pay-button');
+                    
+                    console.log('Razorpay payment handler called with:', response);
+                    
+                    // Send payment details via AJAX instead of form submission
+                    const paymentData = {
+                        'razorpay_payment_id': response.razorpay_payment_id,
+                        'razorpay_order_id': response.razorpay_order_id,
+                        'razorpay_signature': response.razorpay_signature,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    };
+                    
+                    console.log('Sending payment data:', paymentData);
+                    
+                    // Show processing message
+                    showPaymentMessage('Processing payment...', 'info');
+                    
+                    fetch('{% url "payment_callback" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: new URLSearchParams(paymentData)
+                    })
+                    .then(response => {
+                        console.log('Payment callback response:', response);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Payment callback data:', data);
+                        if (data.success) {
+                            showPaymentMessage(data.message, 'success');
+                            setTimeout(() => {
+                                console.log('Redirecting to:', data.redirect_url);
+                                window.location.href = data.redirect_url;
+                            }, 2000);
+                        } else {
+                            showPaymentMessage(data.error || 'Payment verification failed. Please try again.', 'error');
+                            if (payButton) {
+                                payButton.disabled = false;
+                                payButton.innerHTML = '<i class="fas fa-lock mr-2"></i>Pay ₹{{ cart.get_total_price }}';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Payment callback error:', error);
+                        showPaymentMessage('Payment verification failed. Please try again.', 'error');
+                        if (payButton) {
+                            payButton.disabled = false;
+                            payButton.innerHTML = '<i class="fas fa-lock mr-2"></i>Pay ₹{{ cart.get_total_price }}';
+                        }
+                    });
+                },
+                "prefill": data.prefill || {},
+                "theme": {
+                    "color": "#2563eb"
+                },
+                "modal": {
+                    "ondismiss": () => {
+                        this.disabled = false;
+                        this.innerHTML = '<i class="fas fa-lock mr-2"></i>Pay ₹{{ cart.get_total_price }}';
+                    },
+                    "confirm_close": true
+                },
+                "retry": {
+                    "enabled": true,
+                    "max_count": 3
+                }
+            };
+            
+            const rzp = new window.Razorpay(options);
+            
+            // Handle payment failure
+            rzp.on('payment.failed', (response) => {
+                console.error('Payment failed:', response.error);
+                showPaymentMessage('Payment failed: ' + response.error.description, 'error');
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-lock mr-2"></i>Pay ₹{{ cart.get_total_price }}';
+            });
+            
+            rzp.open();
+            
+        } catch (error) {
+            console.error('Payment initialization error:', error);
+            
+            let errorMessage = 'Payment initialization failed. ';
+            if (error.message.includes('Failed to load Razorpay script')) {
+                errorMessage += 'Please check your internet connection and try again.';
+            } else if (error.message.includes('HTTP error')) {
+                errorMessage += 'Server error occurred. Please try again.';
+            } else {
+                errorMessage += error.message || 'Please try again.';
+            }
+            
+            showPaymentMessage(errorMessage, 'error');
+            
+            // Reset button
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-lock mr-2"></i>Pay ₹{{ cart.get_total_price }}';
+        }
+    });
+});
+</script>
+
+<style>
+.hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-soft {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+</style>
+{% endblock %}

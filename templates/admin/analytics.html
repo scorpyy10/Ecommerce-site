@@ -1,0 +1,349 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Real-time Analytics - Admin Dashboard{% endblock %}
+{% block page_title %}
+<div class="flex items-center justify-between">
+    <span>Real-time Analytics</span>
+    <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-2 text-sm text-gray-600">
+            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span>Live</span>
+        </div>
+        <span class="text-xs text-gray-500" id="lastUpdated">Loading...</span>
+        <button onclick="refreshAnalytics()" class="px-3 py-1 text-xs bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors">
+            <i class="fas fa-sync-alt mr-1"></i> Refresh
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Loading Spinner -->
+<div id="loadingSpinner" class="flex items-center justify-center py-20">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    <span class="ml-3 text-gray-600">Loading analytics...</span>
+</div>
+
+<!-- Analytics Content -->
+<div id="analyticsContent" class="hidden">
+<!-- Analytics Overview -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Total Revenue -->
+    <div class="bg-white rounded-2xl shadow-soft p-6">
+        <div class="flex items-center">
+            <div class="p-3 bg-green-100 rounded-full">
+                <i class="fas fa-rupee-sign text-2xl text-green-600"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Total Revenue</p>
+                <p class="text-2xl font-bold text-gray-900" name="total_revenue">₹0</p>
+                <p class="text-sm text-green-600">+12% from last month</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Total Orders -->
+    <div class="bg-white rounded-2xl shadow-soft p-6">
+        <div class="flex items-center">
+            <div class="p-3 bg-blue-100 rounded-full">
+                <i class="fas fa-shopping-bag text-2xl text-blue-600"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Total Orders</p>
+                <p class="text-2xl font-bold text-gray-900" name="total_orders">0</p>
+                <p class="text-sm text-blue-600">+8% from last month</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Total Products -->
+    <div class="bg-white rounded-2xl shadow-soft p-6">
+        <div class="flex items-center">
+            <div class="p-3 bg-purple-100 rounded-full">
+                <i class="fas fa-cube text-2xl text-purple-600"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Total Products</p>
+                <p class="text-2xl font-bold text-gray-900" name="total_products">0</p>
+                <p class="text-sm text-purple-600">+5 new this month</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Total Users -->
+    <div class="bg-white rounded-2xl shadow-soft p-6">
+        <div class="flex items-center">
+            <div class="p-3 bg-orange-100 rounded-full">
+                <i class="fas fa-users text-2xl text-orange-600"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Total Users</p>
+                <p class="text-2xl font-bold text-gray-900" name="total_users">0</p>
+                <p class="text-sm text-orange-600">+15% from last month</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <!-- Revenue Chart -->
+    <div class="bg-white rounded-2xl shadow-soft p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-900">Revenue Overview</h3>
+            <select class="px-3 py-1 border border-gray-300 rounded-lg text-sm">
+                <option>Last 7 days</option>
+                <option>Last 30 days</option>
+                <option>Last 3 months</option>
+                <option>Last year</option>
+            </select>
+        </div>
+        <div class="h-80">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- Orders Chart -->
+    <div class="bg-white rounded-2xl shadow-soft p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-900">Orders by Category</h3>
+            <div class="flex space-x-2">
+                <button class="px-3 py-1 text-sm bg-blue-100 text-blue-600 rounded-lg">All Time</button>
+                <button class="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">This Month</button>
+            </div>
+        </div>
+        <div class="h-80">
+            <canvas id="ordersChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity & Top Products -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Recent Orders -->
+    <div class="bg-white rounded-2xl shadow-soft p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-900">Recent Orders</h3>
+            <a href="{% url 'admin_panel:order_list' %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">View All</a>
+        </div>
+        
+        <div class="space-y-4">
+            {% for order in recent_orders|slice:":5" %}
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div class="flex items-center">
+                    <div class="h-10 w-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-shopping-bag text-white text-sm"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900">#{{ order.order_id|truncatechars:8 }}</p>
+                        <p class="text-xs text-gray-600">{{ order.customer_name }}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-medium text-gray-900">₹{{ order.total_amount }}</p>
+                    <p class="text-xs text-gray-600">{{ order.created_at|timesince }} ago</p>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-shopping-bag text-4xl mb-4"></i>
+                <p>No recent orders</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Top Products -->
+    <div class="bg-white rounded-2xl shadow-soft p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold text-gray-900">Top Products</h3>
+            <a href="{% url 'admin_panel:product_list' %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">View All</a>
+        </div>
+        
+        <div class="space-y-4">
+            {% for product in top_products|slice:":5" %}
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div class="flex items-center">
+                    {% if product.get_featured_image_url %}
+                    <img src="{{ product.get_featured_image_url }}" alt="{{ product.title }}" 
+                         class="h-10 w-10 rounded-lg object-cover">
+                    {% else %}
+                    <div class="h-10 w-10 bg-gradient-to-r from-blue-400 to-purple-500 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-cube text-white text-sm"></i>
+                    </div>
+                    {% endif %}
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900">{{ product.title|truncatechars:20 }}</p>
+                        <p class="text-xs text-gray-600">{{ product.category.name }}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-medium text-gray-900">₹{{ product.price }}</p>
+                    <p class="text-xs text-green-600">{{ product.orders_count|default:0 }} orders</p>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-cube text-4xl mb-4"></i>
+                <p>No products found</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="mt-8 bg-white rounded-2xl shadow-soft p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-6">Quick Statistics</h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-3">
+                <i class="fas fa-chart-line text-blue-600"></i>
+            </div>
+            <p class="text-2xl font-bold text-gray-900" name="conversion_rate">0.0%</p>
+            <p class="text-sm text-gray-600">Conversion Rate</p>
+        </div>
+        
+        <div class="text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
+                <i class="fas fa-rupee-sign text-green-600"></i>
+            </div>
+            <p class="text-2xl font-bold text-gray-900" name="avg_order_value">₹0.00</p>
+            <p class="text-sm text-gray-600">Avg. Order Value</p>
+        </div>
+        
+        <div class="text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-purple-100 rounded-full mb-3">
+                <i class="fas fa-redo text-purple-600"></i>
+            </div>
+            <p class="text-2xl font-bold text-gray-900" name="return_rate">3.2%</p>
+            <p class="text-sm text-gray-600">Return Rate</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function fetchAnalyticsData() {
+    const response = await fetch("/admin-panel/api/analytics/");
+    const data = await response.json();
+    
+    updatePageContent(data);
+    document.getElementById('loadingSpinner').classList.add('hidden');
+    document.getElementById('analyticsContent').classList.remove('hidden');
+}
+
+function updatePageContent(data) {
+    // Update key metrics
+    document.querySelectorAll('[name=total_revenue]')[0].innerText = `₹${data.key_metrics.total_revenue.toLocaleString()}`;
+    document.querySelectorAll('[name=total_orders]')[0].innerText = data.key_metrics.total_orders;
+    document.querySelectorAll('[name=total_products]')[0].innerText = data.key_metrics.total_products;
+    document.querySelectorAll('[name=total_users]')[0].innerText = data.key_metrics.total_users;
+    document.querySelectorAll('[name=avg_order_value]')[0].innerText = `₹${data.key_metrics.avg_order_value.toFixed(2)}`;
+    document.querySelectorAll('[name=conversion_rate]')[0].innerText = `${data.key_metrics.conversion_rate.toFixed(1)}%`;
+    
+    // Update last updated
+    document.getElementById('lastUpdated').innerText = `Last Updated: ${data.last_updated}`;
+    
+    // Revenue chart
+    revenueChart.data.labels = data.charts.daily_revenue.map(dr => dr.date);
+    revenueChart.data.datasets[0].data = data.charts.daily_revenue.map(dr => dr.revenue);
+    revenueChart.update();
+    
+    // Orders chart
+    ordersChart.data.labels = data.charts.status_distribution.map(sd => sd.status);
+    ordersChart.data.datasets[0].data = data.charts.status_distribution.map(sd => sd.count);
+    ordersChart.update();
+}
+
+function refreshAnalytics() {
+    document.getElementById('loadingSpinner').classList.remove('hidden');
+    document.getElementById('analyticsContent').classList.add('hidden');
+    fetchAnalyticsData();
+}
+
+document.addEventListener('DOMContentLoaded', fetchAnalyticsData);
+
+// Auto-refresh every 30 seconds
+setInterval(fetchAnalyticsData, 30000);
+
+// Auto-update timestamp to show time since last update
+setInterval(() => {
+    const now = new Date();
+    const timestamp = now.toLocaleTimeString();
+    if (document.getElementById('lastUpdated').innerText !== 'Loading...') {
+        document.getElementById('lastUpdated').innerText = `Last Updated: ${timestamp}`;
+    }
+}, 1000);
+
+// Revenue Chart
+const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+const revenueChart = new Chart(revenueCtx, {
+    type: 'line',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+        datasets: [{
+            label: 'Revenue',
+            data: [12000, 15000, 18000, 22000, 25000, 28000, 32000],
+            borderColor: 'rgb(59, 130, 246)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '₹' + value.toLocaleString();
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Orders by Category Chart
+const ordersCtx = document.getElementById('ordersChart').getContext('2d');
+const ordersChart = new Chart(ordersCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Science Projects', 'Engineering', 'Robotics', 'AI & ML'],
+        datasets: [{
+            data: [35, 25, 20, 20],
+            backgroundColor: [
+                'rgb(59, 130, 246)',
+                'rgb(16, 185, 129)',
+                'rgb(139, 92, 246)',
+                'rgb(245, 158, 11)'
+            ],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    padding: 20,
+                    usePointStyle: true
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

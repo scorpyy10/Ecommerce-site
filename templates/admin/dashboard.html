@@ -1,0 +1,232 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Admin Dashboard - Devam Project{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Total Orders -->
+    <div class="bg-white rounded-2xl shadow-soft p-6 hover-lift">
+        <div class="flex items-center">
+            <div class="p-3 bg-blue-100 rounded-full">
+                <i class="fas fa-shopping-bag text-2xl text-blue-600"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Total Orders</p>
+                <p class="text-2xl font-bold text-gray-900">{{ total_orders }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Total Revenue -->
+    <div class="bg-white rounded-2xl shadow-soft p-6 hover-lift">
+        <div class="flex items-center">
+            <div class="p-3 bg-green-100 rounded-full">
+                <i class="fas fa-rupee-sign text-2xl text-green-600"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Total Revenue</p>
+                <p class="text-2xl font-bold text-gray-900">₹{{ total_revenue|floatformat:0 }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Active Products -->
+    <div class="bg-white rounded-2xl shadow-soft p-6 hover-lift">
+        <div class="flex items-center">
+            <div class="p-3 bg-purple-100 rounded-full">
+                <i class="fas fa-cube text-2xl text-purple-600"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Active Products</p>
+                <p class="text-2xl font-bold text-gray-900">{{ active_products }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pending Orders -->
+    <div class="bg-white rounded-2xl shadow-soft p-6 hover-lift">
+        <div class="flex items-center">
+            <div class="p-3 bg-yellow-100 rounded-full">
+                <i class="fas fa-clock text-2xl text-yellow-600"></i>
+            </div>
+            <div class="ml-4">
+                <p class="text-sm font-medium text-gray-600">Pending Orders</p>
+                <p class="text-2xl font-bold text-gray-900">{{ pending_orders }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="lg:col-span-2">
+        <!-- Recent Orders -->
+        <div class="bg-white rounded-2xl shadow-soft p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-gray-900">Recent Orders</h2>
+                <a href="{% url 'admin_panel:order_list' %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                    View All
+                    <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="border-b border-gray-200">
+                            <th class="text-left py-3 px-4 font-medium text-gray-600">Order ID</th>
+                            <th class="text-left py-3 px-4 font-medium text-gray-600">Customer</th>
+                            <th class="text-left py-3 px-4 font-medium text-gray-600">Amount</th>
+                            <th class="text-left py-3 px-4 font-medium text-gray-600">Status</th>
+                            <th class="text-left py-3 px-4 font-medium text-gray-600">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        {% for order in recent_orders %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-3 px-4">
+                                <a href="{% url 'admin_panel:order_detail' order.order_id %}" class="text-blue-600 hover:text-blue-800 font-medium">
+                                    #{{ order.order_id|slice:":8" }}...
+                                </a>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div>
+                                    <p class="font-medium text-gray-900">{{ order.customer_name }}</p>
+                                    <p class="text-sm text-gray-600">{{ order.customer_email }}</p>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 font-medium text-gray-900">₹{{ order.total_amount }}</td>
+                            <td class="py-3 px-4">
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                    {% if order.status == 'completed' %}bg-green-100 text-green-800
+                                    {% elif order.status == 'processing' %}bg-blue-100 text-blue-800
+                                    {% elif order.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                    {% elif order.status == 'failed' %}bg-red-100 text-red-800
+                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-sm text-gray-600">
+                                {{ order.created_at|date:"M d, Y" }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="py-8 text-center text-gray-500">
+                                <i class="fas fa-inbox text-4xl text-gray-300 mb-4"></i>
+                                <p>No orders yet</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="space-y-6">
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-2xl shadow-soft p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+            <div class="space-y-4">
+                <a href="{% url 'admin_panel:product_create' %}" class="flex items-center p-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 group">
+                    <i class="fas fa-plus-circle text-xl mr-3"></i>
+                    <div>
+                        <p class="font-medium">Add New Product</p>
+                        <p class="text-sm opacity-90">Create a new product listing</p>
+                    </div>
+                    <i class="fas fa-arrow-right ml-auto group-hover:translate-x-1 transition-transform"></i>
+                </a>
+                
+                <a href="{% url 'admin_panel:category_create' %}" class="flex items-center p-4 bg-white border-2 border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 group">
+                    <i class="fas fa-tags text-xl text-blue-600 mr-3"></i>
+                    <div>
+                        <p class="font-medium text-gray-900">Add Category</p>
+                        <p class="text-sm text-gray-600">Create a new product category</p>
+                    </div>
+                    <i class="fas fa-arrow-right ml-auto text-blue-600 group-hover:translate-x-1 transition-transform"></i>
+                </a>
+                
+                <a href="{% url 'admin_panel:order_list' %}?status=pending" class="flex items-center p-4 bg-white border-2 border-gray-200 rounded-xl hover:border-yellow-300 hover:bg-yellow-50 transition-all duration-200 group">
+                    <i class="fas fa-clock text-xl text-yellow-600 mr-3"></i>
+                    <div>
+                        <p class="font-medium text-gray-900">Pending Orders</p>
+                        <p class="text-sm text-gray-600">Review pending orders</p>
+                    </div>
+                    <i class="fas fa-arrow-right ml-auto text-yellow-600 group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Order Status Summary -->
+        <div class="bg-white rounded-2xl shadow-soft p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">Order Status</h2>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                        <span class="text-gray-700">Completed</span>
+                    </div>
+                    <span class="font-bold text-gray-900">{{ completed_orders }}</span>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                        <span class="text-gray-700">Processing</span>
+                    </div>
+                    <span class="font-bold text-gray-900">{{ processing_orders }}</span>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div>
+                        <span class="text-gray-700">Pending</span>
+                    </div>
+                    <span class="font-bold text-gray-900">{{ pending_orders }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top Products -->
+{% if top_products %}
+<div class="bg-white rounded-2xl shadow-soft p-6">
+    <h2 class="text-xl font-bold text-gray-900 mb-6">Top Selling Products</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        {% for product in top_products %}
+        <div class="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors">
+            <div class="flex items-center mb-3">
+                {% if product.get_featured_image_url %}
+                    <img src="{{ product.get_featured_image_url }}" alt="{{ product.title }}" class="w-12 h-12 rounded-lg object-cover mr-3">
+                {% else %}
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg flex items-center justify-center mr-3">
+                        <i class="fas fa-cube text-white text-lg"></i>
+                    </div>
+                {% endif %}
+                <div class="flex-1 min-w-0">
+                    <p class="font-medium text-gray-900 truncate">{{ product.title }}</p>
+                    <p class="text-sm text-gray-600">{{ product.order_count }} orders</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <span class="text-lg font-bold text-gray-900">₹{{ product.price }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-refresh dashboard data every 5 minutes
+    setTimeout(() => {
+        location.reload();
+    }, 300000);
+</script>
+{% endblock %}

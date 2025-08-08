@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Order #{{ order.order_id }} - Devam Project{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-6">
+        <div class="flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-gray-900">Order #{{ order.order_id }}</h1>
+            <a href="{% url 'order_list' %}" class="text-blue-600 hover:text-blue-500">
+                ← Back to Orders
+            </a>
+        </div>
+        <p class="text-gray-600 mt-1">Placed on {{ order.created_at|date:"F d, Y \a\t H:i" }}</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Order Items -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-800">Order Items</h2>
+                </div>
+                <div class="p-6">
+                    {% for item in order.items.all %}
+                    <div class="flex items-start space-x-4 mb-6 last:mb-0">
+                        {% if item.project.featured_image %}
+                        <img src="{{ item.project.featured_image.url }}" alt="{{ item.project_title }}"
+                             class="w-20 h-20 object-cover rounded-lg">
+                        {% else %}
+                        <div class="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-image text-gray-400"></i>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold text-gray-800">{{ item.project_title }}</h3>
+                            <p class="text-gray-600 mb-2">Quantity: {{ item.quantity }}</p>
+                            <p class="text-blue-600 font-semibold">₹{{ item.project_price }}</p>
+                            
+                            <!-- Delivery Status -->
+                            <div class="mt-3">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {% if item.delivery_status == 'delivered' %}bg-green-100 text-green-800
+                                    {% elif item.delivery_status == 'processing' %}bg-yellow-100 text-yellow-800
+                                    {% elif item.delivery_status == 'failed' %}bg-red-100 text-red-800
+                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ item.get_delivery_status_display }}
+                                </span>
+                            </div>
+                            
+                            <!-- Download Button -->
+                            {% if item.delivery_status == 'delivered' and item.can_download %}
+                            <div class="mt-3">
+                                <a href="{% url 'download_file' item.id %}" 
+                                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                                    <i class="fas fa-download mr-2"></i>
+                                    Download ({{ item.download_count }}/{{ item.max_downloads }})
+                                </a>
+                            </div>
+                            {% elif item.delivery_status == 'delivered' %}
+                            <div class="mt-3">
+                                <span class="text-sm text-gray-500">Download limit reached or expired</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="text-right">
+                            <p class="text-lg font-semibold text-gray-800">₹{{ item.get_total_price }}</p>
+                        </div>
+                    </div>
+                    {% if not forloop.last %}
+                    <hr class="my-6">
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-lg shadow-md mb-6">
+                <div class="p-6 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-800">Order Summary</h2>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Total Items:</span>
+                            <span class="font-medium">{{ order.get_total_items }}</span>
+                        </div>
+                        <div class="flex justify-between text-lg font-bold">
+                            <span>Total Amount:</span>
+                            <span>₹{{ order.total_amount }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Status -->
+            <div class="bg-white rounded-lg shadow-md mb-6">
+                <div class="p-6 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-800">Order Status</h2>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-3">
+                        <div>
+                            <span class="text-gray-600">Order Status:</span>
+                            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                {% if order.status == 'completed' %}bg-green-100 text-green-800
+                                {% elif order.status == 'processing' %}bg-yellow-100 text-yellow-800
+                                {% elif order.status == 'failed' %}bg-red-100 text-red-800
+                                {% elif order.status == 'cancelled' %}bg-gray-100 text-gray-800
+                                {% else %}bg-blue-100 text-blue-800{% endif %}">
+                                {{ order.get_status_display }}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="text-gray-600">Payment Status:</span>
+                            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                {% if order.payment_status == 'completed' %}bg-green-100 text-green-800
+                                {% elif order.payment_status == 'failed' %}bg-red-100 text-red-800
+                                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                {{ order.get_payment_status_display }}
+                            </span>
+                        </div>
+                        {% if order.completed_at %}
+                        <div>
+                            <span class="text-gray-600">Completed:</span>
+                            <span class="ml-2 text-sm">{{ order.completed_at|date:"F d, Y \a\t H:i" }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Information -->
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-800">Customer Information</h2>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-2">
+                        <div>
+                            <span class="text-gray-600">Name:</span>
+                            <span class="ml-2">{{ order.customer_name }}</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-600">Email:</span>
+                            <span class="ml-2">{{ order.customer_email }}</span>
+                        </div>
+                        {% if order.customer_phone %}
+                        <div>
+                            <span class="text-gray-600">Phone:</span>
+                            <span class="ml-2">{{ order.customer_phone }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

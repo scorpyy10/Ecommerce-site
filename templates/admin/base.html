@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Dashboard - Devam Project{% endblock %}</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        secondary: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-in-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'bounce-soft': 'bounceSoft 2s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        bounceSoft: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        'glow': '0 0 20px rgba(59, 130, 246, 0.3)',
+                        'glow-lg': '0 0 30px rgba(59, 130, 246, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-2px);
+        }
+        
+        .sidebar-menu a.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+        }
+        
+        .sidebar-menu a:hover {
+            background: #f3f4f6;
+            transform: translateX(4px);
+        }
+        
+        .sidebar-menu a.active:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            transform: translateX(4px);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="min-h-screen bg-gray-50">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="hidden lg:flex lg:flex-shrink-0">
+            <div class="w-64 bg-white shadow-lg" id="sidebar">
+                <div class="flex items-center justify-center h-16 bg-gradient-to-r from-blue-600 to-purple-600">
+                    <span class="text-white text-xl font-bold">Admin Panel</span>
+                </div>
+                
+                <nav class="mt-8 sidebar-menu h-full overflow-y-auto">
+                    <div class="px-4 space-y-2 pb-8">
+                        <a href="{% url 'admin_panel:dashboard' %}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg transition-all duration-200 {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                            <i class="fas fa-tachometer-alt mr-3"></i>
+                            Dashboard
+                        </a>
+                        
+                        <a href="{% url 'admin_panel:order_list' %}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg transition-all duration-200 {% if 'order' in request.resolver_match.url_name %}active{% endif %}">
+                            <i class="fas fa-shopping-bag mr-3"></i>
+                            Orders
+                        </a>
+                        
+                        <a href="{% url 'admin_panel:product_list' %}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg transition-all duration-200 {% if 'product' in request.resolver_match.url_name %}active{% endif %}">
+                            <i class="fas fa-cube mr-3"></i>
+                            Products
+                        </a>
+                        
+                        <a href="{% url 'admin_panel:category_list' %}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg transition-all duration-200 {% if 'category' in request.resolver_match.url_name %}active{% endif %}">
+                            <i class="fas fa-tags mr-3"></i>
+                            Categories
+                        </a>
+                        
+                        <a href="{% url 'admin_panel:analytics' %}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg transition-all duration-200 {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}">
+                            <i class="fas fa-chart-bar mr-3"></i>
+                            Analytics
+                        </a>
+                        
+                        <div class="border-t border-gray-200 mt-8 pt-4">
+                            <a href="{% url 'home' %}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg transition-all duration-200">
+                                <i class="fas fa-external-link-alt mr-3"></i>
+                                View Site
+                            </a>
+                            
+                            <a href="{% url 'logout' %}" class="flex items-center px-4 py-3 text-red-600 rounded-lg transition-all duration-200 hover:bg-red-50">
+                                <i class="fas fa-sign-out-alt mr-3"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- Mobile sidebar -->
+        <div class="fixed inset-0 z-50 lg:hidden" id="mobile-sidebar-container" style="display: none;">
+            <div class="fixed inset-0 bg-gray-600 bg-opacity-50" id="sidebar-overlay"></div>
+            <div class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out" id="mobile-sidebar">
+                <div class="flex items-center justify-center h-16 bg-gradient-to-r from-blue-600 to-purple-600">
+                    <span class="text-white text-xl font-bold">Admin Panel</span>
+                </div>
+                
+                <nav class="mt-8 sidebar-menu h-full overflow-y-auto">
+                    <div class="px-4 space-y-2 pb-8">
+                        <a href="{% url 'admin_panel:dashboard' %}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg transition-all duration-200 {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                            <i class="fas fa-tachometer-alt mr-3"></i>
+                            Dashboard
+                        </a>
+                        
+                        <a href="{% url 'admin_panel:order_list' %}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg transition-all duration-200 {% if 'order' in request.resolver_match.url_name %}active{% endif %}">
+                            <i class="fas fa-shopping-bag mr-3"></i>
+                            Orders
+                        </a>
+                        
+                        <a href="{% url 'admin_panel:product_list' %}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg transition-all duration-200 {% if 'product' in request.resolver_match.url_name %}active{% endif %}">
+                            <i class="fas fa-cube mr-3"></i>
+                            Products
+                        </a>
+                        
+                        <a href="{% url 'admin_panel:category_list' %}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg transition-all duration-200 {% if 'category' in request.resolver_match.url_name %}active{% endif %}">
+                            <i class="fas fa-tags mr-3"></i>
+                            Categories
+                        </a>
+                        
+                        <a href="{% url 'admin_panel:analytics' %}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg transition-all duration-200 {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}">
+                            <i class="fas fa-chart-bar mr-3"></i>
+                            Analytics
+                        </a>
+                        
+                        <div class="border-t border-gray-200 mt-8 pt-4">
+                            <a href="{% url 'home' %}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg transition-all duration-200">
+                                <i class="fas fa-external-link-alt mr-3"></i>
+                                View Site
+                            </a>
+                            
+                            <a href="{% url 'logout' %}" class="flex items-center px-4 py-3 text-red-600 rounded-lg transition-all duration-200 hover:bg-red-50">
+                                <i class="fas fa-sign-out-alt mr-3"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Bar -->
+            <header class="bg-white shadow-sm border-b border-gray-200 flex-shrink-0">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <div class="flex items-center">
+                        <button class="lg:hidden text-gray-600 hover:text-gray-900" id="sidebar-toggle">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h1 class="ml-4 lg:ml-0 text-2xl font-semibold text-gray-900">
+                            {% block page_title %}Dashboard{% endblock %}
+                        </h1>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-gray-600">Welcome, {{ user.get_full_name|default:user.username }}</span>
+                        <div class="h-8 w-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-white text-sm"></i>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Messages -->
+            {% if messages %}
+            <div class="px-6 py-4 flex-shrink-0">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} mb-4 p-4 rounded-lg border {% if message.tags == 'success' %}bg-green-50 border-green-200 text-green-800{% elif message.tags == 'error' %}bg-red-50 border-red-200 text-red-800{% elif message.tags == 'warning' %}bg-yellow-50 border-yellow-200 text-yellow-800{% else %}bg-blue-50 border-blue-200 text-blue-800{% endif %}">
+                    <div class="flex items-center">
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} mr-2"></i>
+                        {{ message }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Page Content -->
+            <main class="flex-1 overflow-y-auto p-6">
+                {% block content %}
+                {% endblock %}
+            </main>
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
+    <script>
+        // Sidebar toggle for mobile
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const mobileSidebarContainer = document.getElementById('mobile-sidebar-container');
+        const mobileSidebar = document.getElementById('mobile-sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        
+        function toggleSidebar() {
+            if (mobileSidebarContainer && mobileSidebar) {
+                mobileSidebarContainer.style.display = mobileSidebarContainer.style.display === 'none' ? 'block' : 'none';
+                mobileSidebar.classList.toggle('-translate-x-full');
+            }
+        }
+        
+        function closeSidebar() {
+            if (mobileSidebarContainer && mobileSidebar) {
+                mobileSidebar.classList.add('-translate-x-full');
+                setTimeout(() => {
+                    mobileSidebarContainer.style.display = 'none';
+                }, 300);
+            }
+        }
+        
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', toggleSidebar);
+        }
+        
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', closeSidebar);
+        }
+        
+        // Add loading states to forms
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function() {
+                const submitButton = form.querySelector('button[type="submit"]');
+                if (submitButton) {
+                    const originalText = submitButton.innerHTML;
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+                    submitButton.disabled = true;
+                }
+            });
+        });
+        
+        // Auto-hide alerts after 5 seconds
+        document.querySelectorAll('.alert').forEach(alert => {
+            setTimeout(() => {
+                alert.style.transition = 'opacity 0.5s ease-out';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            }, 5000);
+        });
+        
+        // Confirm delete actions
+        document.querySelectorAll('[data-confirm]').forEach(element => {
+            element.addEventListener('click', function(e) {
+                const message = this.getAttribute('data-confirm');
+                if (!confirm(message)) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

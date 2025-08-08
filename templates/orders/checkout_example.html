@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout - Devam Project{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-2xl font-bold text-gray-800 mb-8">Checkout</h1>
+    <div class="lg:flex lg:space-x-8">
+        <!-- Order Summary -->
+        <div class="lg:w-2/3">
+            <div class="bg-white rounded-lg shadow-md">
+                <h2 class="text-lg font-semibold text-gray-800 p-6 border-b border-gray-200">Order Summary</h2>
+                <div class="p-6">
+                    {% for item in cart_items %}
+                    <div class="flex items-center space-x-4 mb-4">
+                        {% if item.project.featured_image %}
+                        <img src="{{ item.project.featured_image.url }}" alt="{{ item.project.title }}"
+                             class="w-16 h-16 object-cover rounded-lg">
+                        {% else %}
+                        <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-image text-gray-400"></i>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold text-gray-800">
+                                <a href="{% url 'project_detail' item.project.slug %}"
+                                   class="hover:text-blue-600">{{ item.project.title }}</a>
+                            </h3>
+                            <p class="text-blue-600 font-semibold mt-1">₹{{ item.project.price }}</p>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm text-gray-600 mr-2">Qty:</span>
+                            <span>{{ item.quantity }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="p-6 border-t border-gray-200">
+                    <div class="flex justify-between text-lg font-bold text-gray-800">
+                        <span>Total</span>
+                        <span>₹{{ cart.get_total_price }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Form -->
+        <div class="lg:w-1/3 mt-8 lg:mt-0">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">Payment Information</h2>
+
+                <!-- Payment Methods -->
+                <div class="border rounded-lg p-4 mb-4">
+                    <div class="flex items-center">
+                        <input id="razorpay" name="payment_method" type="radio" value="razorpay" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" checked>
+                        <label for="razorpay" class="ml-3 flex items-center">
+                            <span class="text-sm font-medium text-gray-900">Razorpay</span>
+                            <span class="ml-2 text-xs text-gray-500">(Credit/Debit Card, UPI, Net Banking, etc.)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Razorpay Button -->
+                <div id="razorpay-button-container"></div>
+
+                <p class="text-xs text-gray-500 mt-4">
+                    You will be redirected to Razorpay for payment.
+                    Ensure that pop-ups are enabled.
+                </p>
+
+                <div class="flex items-center justify-center space-x-2 text-xs text-gray-500 mt-4">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Secured by Razorpay</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #razorpay-button-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="mt-6">
+    <button id="pay-button" class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center transition duration-150 ease-in-out">
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" id="loadingSpinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span id="payButtonText">Pay ₹{{ cart.get_total_price }}</span>
+    </button>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script type="text/javascript">
+        document.getElementById('pay-button').addEventListener('click', function(e) {
+            e.preventDefault();
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const payButtonText = document.getElementById('payButtonText');
+            loadingSpinner.classList.remove('hidden');
+            payButtonText.textContent = 'Processing...';
+            
+            fetch('{% url "create_razorpay_order" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    var options = {
+                        "key": "{{ razorpay_key_id }}", // Enter the Key ID generated from the Dashboard
+                        "amount": data.amount.toString(),
+                        "currency": "INR",
+                        "name": "Devam Project",
+                        "description": data.description,
+                        "order_id": data.order_id,
+                        "handler": function (response){
+                            // After payment successful
+                            fetch("{% url 'payment_callback' %}", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': '{{ csrf_token }}'
+                                },
+                                body: JSON.stringify({
+                                    "razorpay_payment_id": response.razorpay_payment_id,
+                                    "razorpay_order_id": response.razorpay_order_id,
+                                    "razorpay_signature": response.razorpay_signature
+                                })
+                            })
+                            .then(response => window.location.href = "{% url 'payment_success' %}")
+                            .catch(error => alert('Payment verification failed: ' + error));
+                        },
+                        "prefill": {
+                            "name": "{{ user.get_full_name|default:user.username }}",
+                            "email": "{{ user.email }}"
+                        },
+                        "notes": {
+                            "address": "Razorpay Corporate Office"
+                        },
+                        "theme": {
+                            "color": "#3399cc"
+                        }
+                    };
+                    var rzp1 = new Razorpay(options);
+                    rzp1.on('payment.failed', function (response){
+                        alert(response.error.code + ": " + response.error.description);
+                    });
+                    rzp1.open();
+                }
+            })
+            .finally(() => {
+                loadingSpinner.classList.add('hidden');
+                payButtonText.textContent = 'Pay ₹{{ cart.get_total_price }}';
+            });
+        });
+    </script>
+</div>
+
+{% endblock %}

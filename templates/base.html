@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Devam Project - Science & Technology Marketplace{% endblock %}</title>
+    
+    <!-- Tailwind CSS - Production Ready -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        secondary: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-in-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'bounce-soft': 'bounceSoft 2s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        bounceSoft: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        'glow': '0 0 20px rgba(59, 130, 246, 0.3)',
+                        'glow-lg': '0 0 30px rgba(59, 130, 246, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-2px);
+        }
+        
+        .form-floating-custom {
+            position: relative;
+        }
+        
+        .form-floating-custom input,
+        .form-floating-custom select,
+        .form-floating-custom textarea {
+            height: auto;
+            padding: 1rem 0.75rem 0.25rem 0.75rem;
+        }
+        
+        .form-floating-custom label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            padding: 1rem 0.75rem;
+            pointer-events: none;
+            border: 1px solid transparent;
+            transform-origin: 0 0;
+            transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
+        }
+        
+        .form-floating-custom input:focus ~ label,
+        .form-floating-custom input:not(:placeholder-shown) ~ label,
+        .form-floating-custom select:focus ~ label,
+        .form-floating-custom select:not([value=""]) ~ label,
+        .form-floating-custom textarea:focus ~ label,
+        .form-floating-custom textarea:not(:placeholder-shown) ~ label {
+            opacity: 0.65;
+            transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+        }
+        
+        /* Line Clamp Utility */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        /* Smooth scrolling for anchor links */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Enhanced card hover effects */
+        .card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Product card specific styles */
+        .product-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #ffffff;
+            border: 1px solid rgba(229, 231, 235, 0.8);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+        
+        /* Image loading placeholder */
+        .img-placeholder {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* Button hover effects */
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        /* Better focus states */
+        .focus\:ring-custom:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Price gradient text */
+        .price-gradient {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="min-h-screen bg-gray-50 transition-colors duration-300">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50 border-b border-gray-100 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="{% url 'home' %}" class="flex-shrink-0 flex items-center group">
+                        <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-200">
+                            <i class="fas fa-atom text-white text-lg"></i>
+                        </div>
+                        <span class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Devam Project</span>
+                    </a>
+                </div>
+                
+                <!-- Center Navigation Links -->
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="{% url 'home' %}" class="text-gray-700 hover:text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">Home</a>
+                    <a href="{% url 'project_list' %}" class="text-gray-700 hover:text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">Projects</a>
+                    <div class="relative">
+                        <button id="categories-button" class="text-gray-700 hover:text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg text-sm font-medium flex items-center focus:outline-none transition-all duration-200">
+                            Categories <i id="categories-chevron" class="fas fa-chevron-down ml-2 text-xs transition-transform duration-200"></i>
+                        </button>
+                        <div id="categories-menu" class="absolute left-0 mt-2 w-56 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible transform scale-95 transition-all duration-200 z-50">
+                            {% if nav_categories %}
+                                {% for category in nav_categories %}
+                                    <a href="{% url 'category_projects' category.slug %}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 {% if forloop.first %}rounded-t-xl{% endif %} {% if forloop.last %}rounded-b-xl{% endif %}">
+                                        <i class="fas fa-folder mr-2 text-xs"></i>{{ category.name }}
+                                    </a>
+                                {% endfor %}
+                            {% else %}
+                                <span class="block px-4 py-3 text-sm text-gray-500 rounded-xl">No categories available</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-sm mx-6 hidden md:block">
+                    <form method="GET" action="{% url 'search' %}" class="relative">
+                        <input type="text" name="q" placeholder="Search projects..." 
+                               class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-500 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all duration-200 text-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Right side buttons -->
+                <div class="flex items-center space-x-3">
+
+                    <!-- Cart -->
+                    <a href="{% url 'cart' %}" class="relative p-2.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200">
+                        <i class="fas fa-shopping-cart text-lg"></i>
+                        {% if cart_items_count > 0 %}
+                        <span class="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium animate-pulse">
+                            {{ cart_items_count }}
+                        </span>
+                        {% endif %}
+                    </a>
+                    
+                    <!-- User Menu -->
+                    {% if user.is_authenticated %}
+                    <div class="relative">
+                        <button id="user-menu-button" class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg focus:outline-none transition-all duration-200">
+                            <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white text-sm"></i>
+                            </div>
+                            <span class="hidden md:block font-medium">{{ user.username }}</span>
+                            <i class="fas fa-chevron-down text-xs transition-transform duration-200"></i>
+                        </button>
+                        <div id="user-menu" class="absolute right-0 mt-2 w-52 bg-white shadow-xl rounded-xl border border-gray-100 opacity-0 invisible transform scale-95 transition-all duration-200 z-50">
+                            <a href="{% url 'profile' %}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-t-xl transition-colors duration-200">
+                                <i class="fas fa-user mr-2"></i>Profile
+                            </a>
+                            <a href="{% url 'order_list' %}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200">
+                                <i class="fas fa-shopping-bag mr-2"></i>My Orders
+                            </a>
+                            {% if user.is_staff or user.is_superuser %}
+                            <a href="{% url 'admin_panel:dashboard' %}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200">
+                                <i class="fas fa-cog mr-2"></i>Admin Panel
+                            </a>
+                            {% endif %}
+                            <div class="border-t border-gray-100 my-1"></div>
+                            <a href="{% url 'logout' %}" class="block px-4 py-3 text-sm text-red-600 hover:bg-red-50 rounded-b-xl transition-colors duration-200">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200">Login</a>
+                    <a href="{% url 'register' %}" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 text-sm font-medium shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200">Sign Up</a>
+                    {% endif %}
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button class="mobile-menu-button text-gray-600 hover:text-blue-600 focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="mobile-menu hidden md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-100">
+                <a href="{% url 'home' %}" class="block px-3 py-2 text-gray-900 hover:text-blue-600">Home</a>
+                <a href="{% url 'project_list' %}" class="block px-3 py-2 text-gray-900 hover:text-blue-600">Projects</a>
+                {% if nav_categories %}
+                    <div class="px-3 py-2">
+                        <span class="text-gray-600 text-sm font-medium">Categories</span>
+                        <div class="ml-4 mt-1 space-y-1">
+                            {% for category in nav_categories %}
+                                <a href="{% url 'category_projects' category.slug %}" class="block px-2 py-1 text-gray-700 hover:text-blue-600">{{ category.name }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+                <form method="GET" action="{% url 'search' %}" class="px-3 py-2">
+                    <input type="text" name="q" placeholder="Search projects..." 
+                           class="w-full pl-3 pr-4 py-2 border border-gray-300 bg-white text-gray-900 placeholder-gray-500 rounded-lg">
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} mb-4 p-4 rounded-lg border {% if message.tags == 'success' %}bg-green-50 border-green-200 text-green-800{% elif message.tags == 'error' %}bg-red-50 border-red-200 text-red-800{% elif message.tags == 'warning' %}bg-yellow-50 border-yellow-200 text-yellow-800{% else %}bg-blue-50 border-blue-200 text-blue-800{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <h3 class="text-2xl font-bold mb-4">Devam Project</h3>
+                    <p class="text-gray-300 mb-4">Transforming Ideas into Reality through Science & Technology</p>
+                    <p class="text-gray-300">We create and sell innovative science exhibition models, engineering projects, robotics solutions, and organize science events.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'project_list' %}" class="text-gray-300 hover:text-white">All Projects</a></li>
+                        {% if nav_categories %}
+                            {% for category in nav_categories|slice:":4" %}
+                                <li><a href="{% url 'category_projects' category.slug %}" class="text-gray-300 hover:text-white">{{ category.name }}</a></li>
+                            {% endfor %}
+                        {% endif %}
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact Info</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><i class="fas fa-phone mr-2"></i> +91-9426435258</li>
+                        <li><i class="fas fa-envelope mr-2"></i> info@devamproject.com</li>
+                        <li><i class="fas fa-globe mr-2"></i> www.devamproject.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
+                <p>&copy; {% now "Y" %} Devam Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-button').addEventListener('click', function() {
+            document.querySelector('.mobile-menu').classList.toggle('hidden');
+        });
+        
+        // Categories dropdown toggle
+        const categoriesButton = document.querySelector('#categories-button');
+        const categoriesMenu = document.querySelector('#categories-menu');
+        const categoriesChevron = document.querySelector('#categories-chevron');
+        
+        if (categoriesButton && categoriesMenu) {
+            categoriesButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const isOpen = !categoriesMenu.classList.contains('opacity-0');
+                
+                if (isOpen) {
+                    // Close menu
+                    categoriesMenu.classList.add('opacity-0', 'invisible', 'scale-95');
+                    categoriesMenu.classList.remove('opacity-100', 'visible', 'scale-100');
+                    categoriesChevron.style.transform = 'rotate(0deg)';
+                } else {
+                    // Open menu
+                    categoriesMenu.classList.remove('opacity-0', 'invisible', 'scale-95');
+                    categoriesMenu.classList.add('opacity-100', 'visible', 'scale-100');
+                    categoriesChevron.style.transform = 'rotate(180deg)';
+                }
+            });
+            
+            // Close categories menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!categoriesButton.contains(event.target) && !categoriesMenu.contains(event.target)) {
+                    categoriesMenu.classList.add('opacity-0', 'invisible', 'scale-95');
+                    categoriesMenu.classList.remove('opacity-100', 'visible', 'scale-100');
+                    categoriesChevron.style.transform = 'rotate(0deg)';
+                }
+            });
+        }
+        
+        // User menu dropdown toggle
+        const userMenuButton = document.querySelector('#user-menu-button');
+        const userMenu = document.querySelector('#user-menu');
+        const chevronIcon = userMenuButton ? userMenuButton.querySelector('.fa-chevron-down') : null;
+        
+        if (userMenuButton && userMenu) {
+            userMenuButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const isOpen = !userMenu.classList.contains('opacity-0');
+                
+                if (isOpen) {
+                    // Close menu
+                    userMenu.classList.add('opacity-0', 'invisible');
+                    userMenu.classList.remove('opacity-100', 'visible');
+                    chevronIcon.style.transform = 'rotate(0deg)';
+                } else {
+                    // Open menu
+                    userMenu.classList.remove('opacity-0', 'invisible');
+                    userMenu.classList.add('opacity-100', 'visible');
+                    chevronIcon.style.transform = 'rotate(180deg)';
+                }
+            });
+            
+            // Close user menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                    userMenu.classList.add('opacity-0', 'invisible');
+                    userMenu.classList.remove('opacity-100', 'visible');
+                    chevronIcon.style.transform = 'rotate(0deg)';
+                }
+            });
+        }
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.querySelector('.mobile-menu');
+            const mobileMenuButton = document.querySelector('.mobile-menu-button');
+            
+            if (!mobileMenuButton.contains(event.target) && !mobileMenu.contains(event.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+        
+        // Add smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Add loading states to buttons
+        document.querySelectorAll('.btn').forEach(button => {
+            if (button.type === 'submit' || button.classList.contains('btn-submit')) {
+                button.addEventListener('click', function() {
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+                    this.disabled = true;
+                    
+                    // Re-enable after 5 seconds as fallback
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                    }, 5000);
+                });
+            }
+        });
+        
+        // Add fade-in animation to cards
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in');
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.card').forEach(card => {
+            observer.observe(card);
+        });
+        
+        // Handle image loading errors with better fallbacks
+        document.addEventListener('DOMContentLoaded', function() {
+            const images = document.querySelectorAll('img[data-fallback]');
+            images.forEach(img => {
+                img.addEventListener('error', function() {
+                    this.style.display = 'none';
+                    const fallback = this.nextElementSibling;
+                    if (fallback && fallback.classList.contains('img-fallback')) {
+                        fallback.style.display = 'flex';
+                    }
+                });
+            });
+        });
+        
+
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

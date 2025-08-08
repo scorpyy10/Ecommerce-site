@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}My Orders - Devam Marketplace{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">My Orders</h1>
+
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+            <ul role="list" class="divide-y divide-gray-200">
+                {% if orders.exists %}
+                    {% for order in orders %}
+                        <li class="px-4 py-4 sm:px-6">
+                            <div class="flex items-center justify-between">
+                                <p class="text-sm font-medium text-indigo-600 truncate">Order #{{ order.id }}</p>
+                                <div class="ml-2 flex-shrink-0 flex">
+                                    <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ order.get_status_display_class }}">
+                                        {{ order.get_status_display }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="mt-2 sm:flex sm:justify-between">
+                                <div class="sm:flex">
+                                    <p class="flex items-center text-sm text-gray-500">
+                                        Placed on {{ order.created_at|date:"F d, Y" }}
+                                    </p>
+                                </div>
+                                <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                                    <p>Total: ${{ order.total_amount }}</p>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <p class="text-sm text-gray-900">Items:</p>
+                                <ul class="pl-5 list-disc text-sm text-gray-700">
+                                    {% for item in order.items.all %}
+                                        <li>{{ item.quantity }} x {{ item.project.title }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    <li class="px-4 py-4 sm:px-6 text-center text-gray-500">
+                        You have no orders yet.
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
