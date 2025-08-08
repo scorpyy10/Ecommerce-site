@@ -6,7 +6,7 @@ services:
     buildCommand: |
       pip install -r requirements.txt
       python manage.py collectstatic --noinput
-    startCommand: gunicorn devam_marketplace.wsgi:application --workers=3 --timeout=120
+    startCommand: python manage.py migrate --noinput && gunicorn devam_marketplace.wsgi:application --workers=3 --timeout=120
     autoDeploy: true
     envVars:
       - key: PYTHON_VERSION
