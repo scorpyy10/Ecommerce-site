@@ -1,16 +1,18 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView
+from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
-from django.db.models import Q, Count, Sum
+from django.db.models import Q, Count, Sum, Avg
 from django.utils import timezone
 from datetime import datetime, timedelta
 from .models import Project, Category, ProjectImage
 from orders.models import Order, OrderItem
 from .admin_forms import ProjectCreateForm, ProjectUpdateForm, CategoryForm, ProjectImageFormSet
+from django.contrib.auth.models import User
 import json
 
 
@@ -225,6 +227,12 @@ class AdminProductListView(AdminRequiredMixin, ListView):
         context['current_category'] = self.request.GET.get('category', 'all')
         context['current_status'] = self.request.GET.get('status', 'all')
         context['search_query'] = self.request.GET.get('search', '')
+        # Average price across the full filtered queryset (not just current page)
+        try:
+            qs = self.get_queryset()
+            context['avg_price'] = qs.aggregate(avg=Avg('price'))['avg'] or 0
+        except Exception:
+            context['avg_price'] = 0
         return context
 
 
@@ -429,19 +437,9 @@ def admin_analytics(request):
 def analytics_api(request):
     """API endpoint for real-time analytics data"""
     from django.http import JsonResponse
-    from orders.models import Order, OrderItem
-    from projects.models import Project, Category
-    from django.contrib.auth.models import User
-    from django.db.models import Sum, Count, Avg
-    from django.utils import timezone
-    from datetime import timedelta
-    import json
-    
-    # Get date ranges
+    # Dates for charts and comparisons
     today = timezone.now().date()
     last_30_days = [today - timedelta(days=x) for x in range(29, -1, -1)]
-    
-    # Key metrics
     total_revenue = Order.objects.filter(
         payment_status='completed'
     ).aggregate(total=Sum('total_amount'))['total'] or 0
@@ -456,10 +454,12 @@ def analytics_api(request):
     for order in recent_orders:
         recent_orders_data.append({
             'order_id': str(order.order_id)[:8],
+            'order_id_full': str(order.order_id),
             'customer_name': order.customer_name,
             'total_amount': float(order.total_amount),
             'created_at': order.created_at.strftime('%Y-%m-%d %H:%M'),
-            'status': order.status
+            'status': order.status,
+            'detail_url': reverse('admin_panel:order_detail', kwargs={'order_id': order.order_id})
         })
     
     # Top products (by order count)
@@ -471,10 +471,14 @@ def analytics_api(request):
     for product in top_products:
         top_products_data.append({
             'title': product.title,
+            'id': product.id,
+            'slug': product.slug,
             'category': product.category.name if product.category else 'Uncategorized',
             'price': float(product.price),
             'orders_count': product.orders_count,
-            'image_url': product.get_featured_image_url() if hasattr(product, 'get_featured_image_url') else None
+            'image_url': product.get_featured_image_url() if hasattr(product, 'get_featured_image_url') else None,
+            'detail_url': reverse('project_detail', args=[product.slug]),
+            'admin_edit_url': reverse('admin_panel:product_edit', kwargs={'pk': product.id})
         })
     
     # Daily revenue for last 30 days
@@ -516,20 +520,57 @@ def analytics_api(request):
         payment_status='completed'
     ).aggregate(avg=Avg('total_amount'))['avg'] or 0
     
-    # Get orders from last month for comparison
-    last_month_start = today.replace(day=1) - timedelta(days=1)
-    last_month_start = last_month_start.replace(day=1)
+    # Get current and last month ranges
+    first_of_this_month = today.replace(day=1)
+    last_month_end = first_of_this_month - timedelta(days=1)
+    first_of_last_month = last_month_end.replace(day=1)
+
+    # Orders MoM
     this_month_orders = Order.objects.filter(
-        created_at__date__gte=today.replace(day=1)
+        created_at__date__gte=first_of_this_month
     ).count()
     last_month_orders = Order.objects.filter(
-        created_at__date__gte=last_month_start,
-        created_at__date__lt=today.replace(day=1)
+        created_at__date__gte=first_of_last_month,
+        created_at__date__lte=last_month_end
     ).count()
-    
-    order_growth = 0
+    order_growth = 0.0
     if last_month_orders > 0:
-        order_growth = ((this_month_orders - last_month_orders) / last_month_orders) * 100
+        order_growth = ((this_month_orders - last_month_orders) / last_month_orders) * 100.0
+
+    # Products new this month
+    try:
+        products_new_this_month = Project.objects.filter(
+            created_at__date__gte=first_of_this_month
+        ).count()
+    except Exception:
+        # If Project doesn't have created_at, default to 0 new
+        products_new_this_month = 0
+
+    # Users MoM growth (based on date_joined)
+    this_month_users = User.objects.filter(
+        date_joined__date__gte=first_of_this_month
+    ).count()
+    last_month_users = User.objects.filter(
+        date_joined__date__gte=first_of_last_month,
+        date_joined__date__lte=last_month_end
+    ).count()
+    users_growth = 0.0
+    if last_month_users > 0:
+        users_growth = ((this_month_users - last_month_users) / last_month_users) * 100.0
+
+    # Revenue MoM (completed payments only)
+    this_month_revenue = Order.objects.filter(
+        payment_status='completed',
+        created_at__date__gte=first_of_this_month
+    ).aggregate(total=Sum('total_amount'))['total'] or 0
+    last_month_revenue = Order.objects.filter(
+        payment_status='completed',
+        created_at__date__gte=first_of_last_month,
+        created_at__date__lte=last_month_end
+    ).aggregate(total=Sum('total_amount'))['total'] or 0
+    revenue_growth = 0.0
+    if last_month_revenue and last_month_revenue > 0:
+        revenue_growth = ((this_month_revenue - last_month_revenue) / last_month_revenue) * 100.0
     
     # Conversion rate (assuming 1000 visitors per month as example)
     conversion_rate = (this_month_orders / 1000) * 100 if this_month_orders > 0 else 0
@@ -542,6 +583,9 @@ def analytics_api(request):
             'total_users': total_users,
             'avg_order_value': float(avg_order_value),
             'order_growth': round(order_growth, 1),
+            'revenue_growth': round(revenue_growth, 1),
+            'products_new_this_month': products_new_this_month,
+            'users_growth': round(users_growth, 1),
             'conversion_rate': round(conversion_rate, 2),
             'return_rate': 3.2  # Static for now
         },
