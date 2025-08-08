@@ -6,13 +6,26 @@ services:
     buildCommand: |
       pip install -r requirements.txt
       python manage.py collectstatic --noinput
-    startCommand: python manage.py migrate --noinput && gunicorn devam_marketplace.wsgi:application --workers=3 --timeout=120
+    startCommand: >-
+      bash -lc '
+      python manage.py migrate --noinput && 
+      if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_EMAIL" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ]; then 
+        python manage.py createsuperuser --noinput || true; 
+      fi && 
+      gunicorn devam_marketplace.wsgi:application --workers=3 --timeout=120'
     autoDeploy: true
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.9"
       - key: DEBUG
         value: "False"
+      # Optional: set these once to auto-create an admin user on first deploy
+      - key: DJANGO_SUPERUSER_USERNAME
+        sync: false
+      - key: DJANGO_SUPERUSER_EMAIL
+        sync: false
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false
       - key: ALLOWED_HOSTS
         # Will be set to Render hostname at deploy time (e.g., devam-marketplace.onrender.com)
         value: "localhost,127.0.0.1"
