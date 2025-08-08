@@ -13,7 +13,7 @@
             <div class="bg-white rounded-lg shadow-md">
                 {% for item in cart_items %}
                 <div class="p-6 {% if not forloop.last %}border-b border-gray-200{% endif %}">
-                    <div class="flex items-center space-x-4">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                         {% if item.project.get_featured_image_url %}
                         <img src="{{ item.project.get_featured_image_url }}" 
                              alt="{{ item.project.title }}" 
@@ -28,7 +28,7 @@
                         </div>
                         {% endif %}
                         
-                        <div class="flex-1">
+                        <div class="flex-1 w-full">
                             <h3 class="text-lg font-semibold text-gray-800">
                                 <a href="{% url 'project_detail' item.project.slug %}" 
                                    class="hover:text-blue-600">{{ item.project.title }}</a>
@@ -36,8 +36,8 @@
                             <p class="text-gray-600 text-sm">{{ item.project.category.name }}</p>
                             <p class="text-blue-600 font-semibold mt-1">₹{{ item.project.price }}</p>
                         </div>
-                        
-                        <div class="flex items-center space-x-3">
+
+                        <div class="flex flex-wrap items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
                             <!-- Quantity -->
                             <form method="POST" action="{% url 'update_cart_item' item.id %}" class="flex items-center">
                                 {% csrf_token %}

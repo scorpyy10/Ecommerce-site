@@ -281,11 +281,11 @@
                     </form>
                 </div>
                 
-                <!-- Right side buttons -->
-                <div class="flex items-center space-x-3">
+                <!-- Right side buttons (hidden on mobile) -->
+                <div class="hidden md:flex items-center space-x-3">
 
                     <!-- Cart -->
-                    <a href="{% url 'cart' %}" class="relative p-2.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200">
+                    <a href="{% url 'cart' %}" class="relative p-2.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200" aria-label="Cart">
                         <i class="fas fa-shopping-cart text-lg"></i>
                         {% if cart_items_count > 0 %}
                         <span class="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium animate-pulse">
@@ -297,7 +297,7 @@
                     <!-- User Menu -->
                     {% if user.is_authenticated %}
                     <div class="relative">
-                        <button id="user-menu-button" class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg focus:outline-none transition-all duration-200">
+                        <button id="user-menu-button" class="flex items-center space-x-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-lg focus:outline-none transition-all duration-200" aria-haspopup="true" aria-expanded="false">
                             <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
                                 <i class="fas fa-user text-white text-sm"></i>
                             </div>
@@ -330,7 +330,15 @@
                 
                 <!-- Mobile menu button -->
                 <div class="md:hidden flex items-center">
-                    <button class="mobile-menu-button text-gray-600 hover:text-blue-600 focus:outline-none">
+                    <a href="{% url 'cart' %}" class="relative p-2.5 mr-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200" aria-label="Cart">
+                        <i class="fas fa-shopping-cart text-lg"></i>
+                        {% if cart_items_count > 0 %}
+                        <span class="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium animate-pulse">
+                            {{ cart_items_count }}
+                        </span>
+                        {% endif %}
+                    </a>
+                    <button class="mobile-menu-button text-gray-600 hover:text-blue-600 focus:outline-none" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
                         <i class="fas fa-bars text-xl"></i>
                     </button>
                 </div>
@@ -338,7 +346,7 @@
         </div>
         
         <!-- Mobile Menu -->
-        <div class="mobile-menu hidden md:hidden">
+        <div id="mobile-menu" class="mobile-menu hidden md:hidden">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-100">
                 <a href="{% url 'home' %}" class="block px-3 py-2 text-gray-900 hover:text-blue-600">Home</a>
                 <a href="{% url 'project_list' %}" class="block px-3 py-2 text-gray-900 hover:text-blue-600">Projects</a>
@@ -356,6 +364,21 @@
                     <input type="text" name="q" placeholder="Search projects..." 
                            class="w-full pl-3 pr-4 py-2 border border-gray-300 bg-white text-gray-900 placeholder-gray-500 rounded-lg">
                 </form>
+
+                <!-- Mobile auth/user links -->
+                <div class="px-3 py-2 border-t border-gray-100 mt-2">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'profile' %}" class="block px-3 py-2 text-gray-900 hover:text-blue-600">Profile</a>
+                        <a href="{% url 'order_list' %}" class="block px-3 py-2 text-gray-900 hover:text-blue-600">My Orders</a>
+                        {% if user.is_staff or user.is_superuser %}
+                        <a href="{% url 'admin_panel:dashboard' %}" class="block px-3 py-2 text-gray-900 hover:text-blue-600">Admin Panel</a>
+                        {% endif %}
+                        <a href="{% url 'logout' %}" class="block px-3 py-2 text-red-600 hover:text-red-700">Logout</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="block px-3 py-2 text-gray-900 hover:text-blue-600">Login</a>
+                        <a href="{% url 'register' %}" class="block px-3 py-2 text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg text-center mt-1">Sign Up</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </nav>
@@ -415,9 +438,14 @@
     <!-- JavaScript -->
     <script>
         // Mobile menu toggle
-        document.querySelector('.mobile-menu-button').addEventListener('click', function() {
-            document.querySelector('.mobile-menu').classList.toggle('hidden');
-        });
+        const mobileMenuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('#mobile-menu');
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', function() {
+                const isHidden = mobileMenu.classList.toggle('hidden');
+                this.setAttribute('aria-expanded', String(!isHidden));
+            });
+        }
         
         // Categories dropdown toggle
         const categoriesButton = document.querySelector('#categories-button');
@@ -491,7 +519,7 @@
         
         // Close mobile menu when clicking outside
         document.addEventListener('click', function(event) {
-            const mobileMenu = document.querySelector('.mobile-menu');
+            const mobileMenu = document.querySelector('#mobile-menu');
             const mobileMenuButton = document.querySelector('.mobile-menu-button');
             
             if (!mobileMenuButton.contains(event.target) && !mobileMenu.contains(event.target)) {

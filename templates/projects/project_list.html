@@ -4,9 +4,32 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Mobile Toolbar: Filters + Sort -->
+    <div class="lg:hidden mb-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <button type="button" id="toggle-filters"
+                    class="inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <i class="fas fa-sliders-h mr-2"></i>
+                Filters
+            </button>
+            <div class="flex items-center space-x-2">
+                <label for="mobile-sort" class="text-sm text-gray-600 font-medium">Sort:</label>
+                <select id="mobile-sort" onchange="updateSort(this.value)" aria-label="Sort projects"
+                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="-created_at" {% if current_sort == '-created_at' %}selected{% endif %}>Newest</option>
+                    <option value="created_at" {% if current_sort == 'created_at' %}selected{% endif %}>Oldest</option>
+                    <option value="price" {% if current_sort == 'price' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="-price" {% if current_sort == '-price' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="title" {% if current_sort == 'title' %}selected{% endif %}>Name: A to Z</option>
+                    <option value="-title" {% if current_sort == '-title' %}selected{% endif %}>Name: Z to A</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
     <div class="flex flex-col lg:flex-row gap-8">
         <!-- Filters Sidebar -->
-<div class="lg:w-1/4 bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+        <div id="filters-sidebar" class="hidden lg:block lg:w-1/4 bg-white rounded-xl shadow-lg p-6 border border-gray-100">
             <h3 class="text-xl font-semibold mb-4 text-gray-800">Filters</h3>
             
             <!-- Categories -->
@@ -51,10 +74,11 @@
                     {% endif %}
                 </h1>
                 
-                <!-- Sort -->
-                <div class="flex items-center space-x-3">
-                    <label class="text-sm text-gray-600 font-medium">Sort by:</label>
-                    <select onchange="updateSort(this.value)" class="px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
+                <!-- Sort (Desktop) -->
+                <div class="hidden md:flex items-center space-x-3">
+                    <label for="desktop-sort" class="text-sm text-gray-600 font-medium">Sort by:</label>
+                    <select id="desktop-sort" onchange="updateSort(this.value)" aria-label="Sort projects"
+                            class="px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
                         <option value="-created_at" {% if current_sort == '-created_at' %}selected{% endif %}>Newest</option>
                         <option value="created_at" {% if current_sort == 'created_at' %}selected{% endif %}>Oldest</option>
                         <option value="price" {% if current_sort == 'price' %}selected{% endif %}>Price: Low to High</option>
@@ -155,5 +179,23 @@ function updateSort(value) {
     url.searchParams.set('sort', value);
     window.location.href = url.toString();
 }
+
+// Mobile filters toggle
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('toggle-filters');
+    const sidebar = document.getElementById('filters-sidebar');
+    if (!toggleBtn || !sidebar) return;
+
+    toggleBtn.addEventListener('click', function() {
+        const isHidden = sidebar.classList.contains('hidden');
+        if (isHidden) {
+            sidebar.classList.remove('hidden');
+            sidebar.classList.add('block');
+        } else {
+            sidebar.classList.add('hidden');
+            sidebar.classList.remove('block');
+        }
+    });
+});
 </script>
 {% endblock %}

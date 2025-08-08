@@ -37,7 +37,7 @@
             <div class="ml-4">
                 <p class="text-sm font-medium text-gray-600">Total Revenue</p>
                 <p class="text-2xl font-bold text-gray-900" name="total_revenue">₹0</p>
-                <p class="text-sm text-green-600">+12% from last month</p>
+                <p class="text-sm" id="revenueGrowthText"><span class="text-green-600">+0%</span> from last month</p>
             </div>
         </div>
     </div>
@@ -51,7 +51,7 @@
             <div class="ml-4">
                 <p class="text-sm font-medium text-gray-600">Total Orders</p>
                 <p class="text-2xl font-bold text-gray-900" name="total_orders">0</p>
-                <p class="text-sm text-blue-600">+8% from last month</p>
+                <p class="text-sm" id="ordersGrowthText"><span class="text-blue-600">+0%</span> from last month</p>
             </div>
         </div>
     </div>
@@ -65,7 +65,7 @@
             <div class="ml-4">
                 <p class="text-sm font-medium text-gray-600">Total Products</p>
                 <p class="text-2xl font-bold text-gray-900" name="total_products">0</p>
-                <p class="text-sm text-purple-600">+5 new this month</p>
+                <p class="text-sm" id="productsNewText"><span class="text-purple-600">+0</span> new this month</p>
             </div>
         </div>
     </div>
@@ -79,7 +79,7 @@
             <div class="ml-4">
                 <p class="text-sm font-medium text-gray-600">Total Users</p>
                 <p class="text-2xl font-bold text-gray-900" name="total_users">0</p>
-                <p class="text-sm text-orange-600">+15% from last month</p>
+                <p class="text-sm" id="usersGrowthText"><span class="text-orange-600">+0%</span> from last month</p>
             </div>
         </div>
     </div>
@@ -128,28 +128,7 @@
         </div>
         
         <div class="space-y-4">
-            {% for order in recent_orders|slice:":5" %}
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div class="flex items-center">
-                    <div class="h-10 w-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
-                        <i class="fas fa-shopping-bag text-white text-sm"></i>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm font-medium text-gray-900">#{{ order.order_id|truncatechars:8 }}</p>
-                        <p class="text-xs text-gray-600">{{ order.customer_name }}</p>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <p class="text-sm font-medium text-gray-900">₹{{ order.total_amount }}</p>
-                    <p class="text-xs text-gray-600">{{ order.created_at|timesince }} ago</p>
-                </div>
-            </div>
-            {% empty %}
-            <div class="text-center py-8 text-gray-500">
-                <i class="fas fa-shopping-bag text-4xl mb-4"></i>
-                <p>No recent orders</p>
-            </div>
-            {% endfor %}
+            <div id="recentOrdersContainer" class="space-y-4"></div>
         </div>
     </div>
     
@@ -161,33 +140,7 @@
         </div>
         
         <div class="space-y-4">
-            {% for product in top_products|slice:":5" %}
-            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div class="flex items-center">
-                    {% if product.get_featured_image_url %}
-                    <img src="{{ product.get_featured_image_url }}" alt="{{ product.title }}" 
-                         class="h-10 w-10 rounded-lg object-cover">
-                    {% else %}
-                    <div class="h-10 w-10 bg-gradient-to-r from-blue-400 to-purple-500 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-cube text-white text-sm"></i>
-                    </div>
-                    {% endif %}
-                    <div class="ml-3">
-                        <p class="text-sm font-medium text-gray-900">{{ product.title|truncatechars:20 }}</p>
-                        <p class="text-xs text-gray-600">{{ product.category.name }}</p>
-                    </div>
-                </div>
-                <div class="text-right">
-                    <p class="text-sm font-medium text-gray-900">₹{{ product.price }}</p>
-                    <p class="text-xs text-green-600">{{ product.orders_count|default:0 }} orders</p>
-                </div>
-            </div>
-            {% empty %}
-            <div class="text-center py-8 text-gray-500">
-                <i class="fas fa-cube text-4xl mb-4"></i>
-                <p>No products found</p>
-            </div>
-            {% endfor %}
+            <div id="topProductsContainer" class="space-y-4"></div>
         </div>
     </div>
 </div>
@@ -243,19 +196,115 @@ function updatePageContent(data) {
     document.querySelectorAll('[name=total_users]')[0].innerText = data.key_metrics.total_users;
     document.querySelectorAll('[name=avg_order_value]')[0].innerText = `₹${data.key_metrics.avg_order_value.toFixed(2)}`;
     document.querySelectorAll('[name=conversion_rate]')[0].innerText = `${data.key_metrics.conversion_rate.toFixed(1)}%`;
-    
+
+    // Growth indicators
+    const revGrowth = data.key_metrics.revenue_growth || 0;
+    const ordersGrowth = data.key_metrics.order_growth || 0;
+    const usersGrowth = data.key_metrics.users_growth || 0;
+    const productsNew = data.key_metrics.products_new_this_month ?? 0;
+    const revGrowthEl = document.getElementById('revenueGrowthText');
+    const ordersGrowthEl = document.getElementById('ordersGrowthText');
+    const usersGrowthEl = document.getElementById('usersGrowthText');
+    const productsNewEl = document.getElementById('productsNewText');
+    if (revGrowthEl) {
+        const positive = revGrowth >= 0;
+        revGrowthEl.innerHTML = `<span class="${positive ? 'text-green-600' : 'text-red-600'}">${positive ? '+' : ''}${revGrowth.toFixed(1)}%</span> from last month`;
+    }
+    if (ordersGrowthEl) {
+        const positive = ordersGrowth >= 0;
+        ordersGrowthEl.innerHTML = `<span class="${positive ? 'text-blue-600' : 'text-red-600'}">${positive ? '+' : ''}${ordersGrowth.toFixed(1)}%</span> from last month`;
+    }
+    if (usersGrowthEl) {
+        const positive = usersGrowth >= 0;
+        usersGrowthEl.innerHTML = `<span class="${positive ? 'text-orange-600' : 'text-red-600'}">${positive ? '+' : ''}${usersGrowth.toFixed(1)}%</span> from last month`;
+    }
+    if (productsNewEl) {
+        const positive = (productsNew || 0) > 0;
+        productsNewEl.innerHTML = `<span class="${positive ? 'text-purple-600' : 'text-gray-500'}">${positive ? '+' : ''}${productsNew}</span> new this month`;
+    }
+
     // Update last updated
     document.getElementById('lastUpdated').innerText = `Last Updated: ${data.last_updated}`;
-    
+
     // Revenue chart
     revenueChart.data.labels = data.charts.daily_revenue.map(dr => dr.date);
     revenueChart.data.datasets[0].data = data.charts.daily_revenue.map(dr => dr.revenue);
     revenueChart.update();
-    
+
     // Orders chart
     ordersChart.data.labels = data.charts.status_distribution.map(sd => sd.status);
     ordersChart.data.datasets[0].data = data.charts.status_distribution.map(sd => sd.count);
     ordersChart.update();
+
+    // Recent Orders list
+    const roContainer = document.getElementById('recentOrdersContainer');
+    if (roContainer) {
+        roContainer.innerHTML = '';
+        if (data.recent_orders && data.recent_orders.length) {
+            data.recent_orders.forEach(o => {
+                const item = document.createElement('a');
+                item.href = o.detail_url;
+                item.className = 'flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100';
+                item.innerHTML = `
+                    <div class="flex items-center">
+                        <div class="h-10 w-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-shopping-bag text-white text-sm"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-gray-900">#${o.order_id}</p>
+                            <p class="text-xs text-gray-600">${o.customer_name || ''}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-medium text-gray-900">₹${Number(o.total_amount).toLocaleString()}</p>
+                        <p class="text-xs text-gray-600">${o.created_at}</p>
+                    </div>`;
+                roContainer.appendChild(item);
+            });
+        } else {
+            roContainer.innerHTML = `
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-shopping-bag text-4xl mb-4"></i>
+                    <p>No recent orders</p>
+                </div>`;
+        }
+    }
+
+    // Top Products list
+    const tpContainer = document.getElementById('topProductsContainer');
+    if (tpContainer) {
+        tpContainer.innerHTML = '';
+        if (data.top_products && data.top_products.length) {
+            data.top_products.forEach(p => {
+                const item = document.createElement('a');
+                item.href = p.admin_edit_url || p.detail_url;
+                item.className = 'flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100';
+                const image = p.image_url ? `<img src="${p.image_url}" alt="${p.title}" class="h-10 w-10 rounded-lg object-cover">`
+                    : `<div class="h-10 w-10 bg-gradient-to-r from-blue-400 to-purple-500 rounded-lg flex items-center justify-center">
+                           <i class="fas fa-cube text-white text-sm"></i>
+                       </div>`;
+                item.innerHTML = `
+                    <div class="flex items-center">
+                        ${image}
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-gray-900">${p.title.length > 20 ? (p.title.slice(0, 19) + '…') : p.title}</p>
+                            <p class="text-xs text-gray-600">${p.category || ''}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-medium text-gray-900">₹${Number(p.price).toLocaleString()}</p>
+                        <p class="text-xs text-green-600">${p.orders_count || 0} orders</p>
+                    </div>`;
+                tpContainer.appendChild(item);
+            });
+        } else {
+            tpContainer.innerHTML = `
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-cube text-4xl mb-4"></i>
+                    <p>No products found</p>
+                </div>`;
+        }
+    }
 }
 
 function refreshAnalytics() {
