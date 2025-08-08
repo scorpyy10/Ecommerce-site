@@ -9,6 +9,8 @@ services:
     startCommand: gunicorn devam_marketplace.wsgi:application --workers=3 --timeout=120
     autoDeploy: true
     envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
       - key: DEBUG
         value: "False"
       - key: ALLOWED_HOSTS
